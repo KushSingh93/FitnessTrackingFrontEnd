@@ -122,7 +122,7 @@ const UserDashboard = () => {
     setCustomCalories("");
   };
 
-  // Modify `handleAddCustomExercise` function
+  // Modify handleAddCustomExercise function
   const handleAddCustomExercise = async () => {
     if (!customName || !customBodyPart || !customCalories) return;
 
@@ -338,7 +338,7 @@ const UserDashboard = () => {
                   className="flex justify-between bg-gray-700 p-3 rounded mb-2"
                 >
                   <span>
-                    {exercise.name} - {exercise.sets} sets, {exercise.reps} reps
+                    {exercise.exerciseName} - {exercise.sets} sets, {exercise.reps} reps
                     -{" "}
                     <span className="text-gray-400">
                       {exercise.caloriesBurntPerSet *
