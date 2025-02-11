@@ -8,7 +8,11 @@ import dayjs from "dayjs";
 
 import { getAllExercises } from "../api/exerciseApi";
 import { addCustomExercise } from "../api/exerciseApi";
-import { getFavoriteExercises, addToFavorites, removeFromFavorites } from "../api/exerciseApi";
+import {
+  getFavoriteExercises,
+  addToFavorites,
+  removeFromFavorites,
+} from "../api/favExerciseApi";
 
 const UserDashboard = () => {
   const [arsenalExercises, setArsenalExercises] = useState([]);
@@ -150,67 +154,81 @@ const UserDashboard = () => {
     0
   );
 
-  //  State for favorite exercises
-const [favoriteExercises, setFavoriteExercises] = useState([]);
+  const [favoriteExercises, setFavoriteExercises] = useState(new Set()); // Store as a Set
+  const token = localStorage.getItem("token");
 
-// Fetch token from localStorage once
-const token = localStorage.getItem("token");
+  // ✅ Fetch Favorites on Component Mount
+  useEffect(() => {
+    // const fetchFavorites = async () => {
+    //   if (!token) return;
+    //   // const favorites = await getFavoriteExercises(token);
+    //   // setFavoriteExercises(new Set(favorites)); // Store favorite exercise IDs
 
-//  Handle Add/Remove Favorite Exercise
-const handleToggleFavorite = async (exerciseId) => {
-  try {
+    // };
+
+    // fetchFavorites();
+    const fetchExercises = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Retrieve token from storage
+        debugger;
+        if (!token) {
+          setError("User not authenticated.");
+          return;
+        }
+
+        const exercises = await getAllExercises(token); // Call API function
+        setArsenalExercises(exercises);
+      } catch (err) {
+        setError("Failed to load exercises.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExercises();
+  }, []);
+
+  // ✅ Toggle Favorite
+  const handleToggleFavorite = async (exercise) => {
     if (!token) {
       console.error("User not authenticated.");
       return;
     }
-
-    if (favoriteExercises.includes(exerciseId)) {
-      //  Remove from Favorites
-      await removeFromFavorites(token, exerciseId);
-      setFavoriteExercises((prevFavorites) =>
-        prevFavorites.filter((id) => id !== exerciseId)
-      );
-    } else {
-      //  Add to Favorites
-      await addToFavorites(token, exerciseId); // Removed userId (not needed in backend)
-      setFavoriteExercises((prevFavorites) => [...prevFavorites, exerciseId]);
-    }
-  } catch (error) {
-    console.error("Error handling favorite toggle:", error);
-  }
-};
-
-//  Fetch Favorite Exercises on Component Mount
-useEffect(() => {
-  const fetchFavorites = async () => {
+  
+    // Optimistically update the UI
+    const updatedExercises = arsenalExercises.map((ex) =>
+      ex.exerciseId === exercise.exerciseId ? { ...ex, favourite: !ex.favourite } : ex
+    );
+    setArsenalExercises(updatedExercises);
+  
     try {
-      if (!token) return;
-
-      const favorites = await getFavoriteExercises(token);
-      setFavoriteExercises(favorites.map((fav) => fav.exerciseId)); // Store only exercise IDs
+      if (exercise.favourite) {
+        await removeFromFavorites(token, exercise.exerciseId);
+      } else {
+        await addToFavorites(token, exercise.exerciseId);
+      }
     } catch (error) {
-      console.error("Failed to fetch favorites:", error);
+      console.error("Failed to update favorite status:", error);
+  
+      // Revert UI change on failure
+      setArsenalExercises(arsenalExercises);
     }
   };
-
-  fetchFavorites();
-}, []); 
-
+  
+  
 
   //  Filter exercises based on search input (by name or body part)
   const filteredExercises = arsenalExercises.filter(
     (exercise) =>
-      exercise?.exerciseName
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      exercise?.bodyPart?.toLowerCase().includes(searchQuery.toLowerCase())
+      exercise.exerciseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exercise.bodyPart.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  //  Sort Arsenal Exercises (Favorites on top)
-  const sortedExercises = [...filteredExercises].sort(
-    (a, b) =>
-      favoriteExercises.includes(b.id) - favoriteExercises.includes(a.id)
-  );
+  
+  const sortedExercises = [...filteredExercises].sort((a, b) => {
+    return b.favourite - a.favourite; // Keep favorites on top after filtering
+  });
+  
+  
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
@@ -274,7 +292,7 @@ useEffect(() => {
             ) : (
               sortedExercises.map((exercise) => (
                 <div
-                  key={exercise.id}
+                  key={exercise.exerciseId}
                   className="flex justify-between bg-gray-700 p-3 rounded mb-2"
                 >
                   <span>
@@ -283,16 +301,14 @@ useEffect(() => {
                     - {exercise.caloriesBurntPerSet} kcal
                   </span>
                   <div className="flex items-center space-x-4">
-                    {/* ❤️ Favorite Button (Individual Toggle) */}
+                    {/* ❤️ Favorite Button (Fixed Toggle) */}
                     <button
-                      onClick={() => handleToggleFavorite(exercise.id)}
+                      onClick={() => handleToggleFavorite(exercise)}
                       className={`text-lg hover:text-red-500 transition ${
-                        favoriteExercises.includes(exercise.id)
-                          ? "text-red-400"
-                          : "text-gray-400"
+                        exercise.favourite ? "text-red-400" : "text-gray-400"
                       }`}
                     >
-                      {favoriteExercises.includes(exercise.id) ? "❤️" : "🤍"}
+                      {exercise.favourite ? "❤️" : "🤍"}
                     </button>
 
                     {/* ➕ Add to Workout Button */}
