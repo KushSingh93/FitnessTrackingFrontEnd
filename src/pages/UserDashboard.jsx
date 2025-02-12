@@ -13,18 +13,30 @@ import {
   addToFavorites,
   removeFromFavorites,
 } from "../api/favExerciseApi";
+import {
+  getTodaysWorkoutExercises,
+  addExerciseToWorkout,
+  removeExerciseFromWorkout,
+} from "../api/workoutExerciseApi";
 
 const UserDashboard = () => {
   const [arsenalExercises, setArsenalExercises] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [todaysWorkout, setTodaysWorkout] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [customDialogOpen, setCustomDialogOpen] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+  const [sets, setSets] = useState("");
+  const [reps, setReps] = useState("");
+  const [streak, setStreak] = useState(8); // Streak Count
 
-  // ✅ Fetch Exercises on Component Mount
+  //  Fetch Arsenal Exercises on Component Mount
   useEffect(() => {
     const fetchExercises = async () => {
       try {
         const token = localStorage.getItem("token"); // Retrieve token from storage
-        debugger;
         if (!token) {
           setError("User not authenticated.");
           return;
@@ -40,6 +52,26 @@ const UserDashboard = () => {
     };
 
     fetchExercises();
+  }, []);
+
+  useEffect(() => {
+    const fetchTodaysWorkout = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("User not authenticated.");
+          return;
+        }
+
+        const exercises = await getTodaysWorkoutExercises(token);
+        console.log("Fetched Today's Workout:", exercises);
+        setTodaysWorkout(exercises);
+      } catch (err) {
+        setError("Failed to load today's workout.");
+      }
+    };
+
+    fetchTodaysWorkout();
   }, []);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -65,15 +97,6 @@ const UserDashboard = () => {
     setShowDatePicker(false); // Close calendar after selection
   };
 
-  const [todaysWorkout, setTodaysWorkout] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [customDialogOpen, setCustomDialogOpen] = useState(false);
-  const [selectedExercise, setSelectedExercise] = useState(null);
-  const [sets, setSets] = useState("");
-  const [reps, setReps] = useState("");
-  const [streak, setStreak] = useState(8); // Streak Count
-
   // Custom Exercise Inputs
   const [customName, setCustomName] = useState("");
   const [customBodyPart, setCustomBodyPart] = useState("");
@@ -89,24 +112,55 @@ const UserDashboard = () => {
     setDialogOpen(true);
   };
 
-  //  Confirm adding exercise
-  const handleAddToWorkout = () => {
+  const handleAddToWorkout = async () => {
     if (!sets || !reps) return;
-    const newWorkout = {
-      ...selectedExercise,
-      sets: Number(sets),
-      reps: Number(reps),
-    };
-    setTodaysWorkout([...todaysWorkout, newWorkout]);
-    setDialogOpen(false);
-    setSets("");
-    setReps("");
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("User not authenticated.");
+        return;
+      }
+
+      const exerciseData = {
+        exerciseId: selectedExercise.exerciseId,
+        sets: Number(sets),
+        reps: Number(reps),
+      };
+
+      const addedExercise = await addExerciseToWorkout(token, exerciseData);
+
+      setTodaysWorkout((prevWorkout) => [...prevWorkout, addedExercise]);
+
+      setDialogOpen(false);
+      setSets("");
+      setReps("");
+    } catch (error) {
+      setError("Failed to add exercise to today's workout.");
+    }
   };
 
   // Remove exercise from Today’s Workout
-  const handleRemoveFromWorkout = (index) => {
-    const updatedWorkout = todaysWorkout.filter((_, i) => i !== index);
-    setTodaysWorkout(updatedWorkout);
+  const handleRemoveFromWorkout = async (workoutExerciseId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("User not authenticated.");
+        return;
+      }
+
+      // ✅ Call backend API to remove exercise
+      await removeExerciseFromWorkout(token, workoutExerciseId);
+
+      // ✅ Update state: Remove exercise from UI immediately
+      setTodaysWorkout((prevWorkout) =>
+        prevWorkout.filter(
+          (exercise) => exercise.workoutExerciseId !== workoutExerciseId
+        )
+      );
+    } catch (error) {
+      setError("Failed to remove exercise.");
+    }
   };
 
   //  Open Custom Exercise Dialog
@@ -136,7 +190,7 @@ const UserDashboard = () => {
       const exerciseData = {
         exerciseName: customName,
         bodyPart: customBodyPart,
-        caloriesBurntPerSet: parseFloat(customCalories), // Ensure it's a number
+        caloriesBurntPerRep: isNaN(parseFloat(customCalories)) ? 0.0 : parseFloat(customCalories), // Ensure it's a number
       };
 
       const newExercise = await addCustomExercise(exerciseData, token); // Call API
@@ -150,7 +204,7 @@ const UserDashboard = () => {
   //  Calculate total calories burned
   const totalCalories = todaysWorkout.reduce(
     (sum, exercise) =>
-      sum + exercise.caloriesBurntPerSet * exercise.sets * exercise.reps,
+      sum + exercise.caloriesBurntPerRep * exercise.sets * exercise.reps,
     0
   );
 
@@ -170,7 +224,6 @@ const UserDashboard = () => {
     const fetchExercises = async () => {
       try {
         const token = localStorage.getItem("token"); // Retrieve token from storage
-        debugger;
         if (!token) {
           setError("User not authenticated.");
           return;
@@ -194,13 +247,15 @@ const UserDashboard = () => {
       console.error("User not authenticated.");
       return;
     }
-  
+
     // Optimistically update the UI
     const updatedExercises = arsenalExercises.map((ex) =>
-      ex.exerciseId === exercise.exerciseId ? { ...ex, favourite: !ex.favourite } : ex
+      ex.exerciseId === exercise.exerciseId
+        ? { ...ex, favourite: !ex.favourite }
+        : ex
     );
     setArsenalExercises(updatedExercises);
-  
+
     try {
       if (exercise.favourite) {
         await removeFromFavorites(token, exercise.exerciseId);
@@ -209,13 +264,11 @@ const UserDashboard = () => {
       }
     } catch (error) {
       console.error("Failed to update favorite status:", error);
-  
+
       // Revert UI change on failure
       setArsenalExercises(arsenalExercises);
     }
   };
-  
-  
 
   //  Filter exercises based on search input (by name or body part)
   const filteredExercises = arsenalExercises.filter(
@@ -223,12 +276,10 @@ const UserDashboard = () => {
       exercise.exerciseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       exercise.bodyPart.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
+
   const sortedExercises = [...filteredExercises].sort((a, b) => {
     return b.favourite - a.favourite; // Keep favorites on top after filtering
   });
-  
-  
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
@@ -298,7 +349,7 @@ const UserDashboard = () => {
                   <span>
                     {exercise.exerciseName}{" "}
                     <span className="text-gray-400">({exercise.bodyPart})</span>{" "}
-                    - {exercise.caloriesBurntPerSet} kcal
+                    - {exercise.caloriesBurntPerRep} kcal
                   </span>
                   <div className="flex items-center space-x-4">
                     {/* ❤️ Favorite Button (Fixed Toggle) */}
@@ -338,17 +389,21 @@ const UserDashboard = () => {
                   className="flex justify-between bg-gray-700 p-3 rounded mb-2"
                 >
                   <span>
-                    {exercise.exerciseName} - {exercise.sets} sets, {exercise.reps} reps
-                    -{" "}
+                    {exercise.exerciseName} - {exercise.sets} sets,{" "}
+                    {exercise.reps} reps -{" "}
                     <span className="text-gray-400">
-                      {exercise.caloriesBurntPerSet *
+                      {(
+                        (exercise.caloriesBurntPerRep || 0) *
                         exercise.sets *
-                        exercise.reps}{" "}
+                        exercise.reps
+                      ).toFixed(2)}{" "}
                       kcal
                     </span>
                   </span>
                   <button
-                    onClick={() => handleRemoveFromWorkout(index)}
+                    onClick={() =>
+                      handleRemoveFromWorkout(exercise.workoutExerciseId)
+                    }
                     className="text-red-400 text-lg hover:text-red-500"
                   >
                     −

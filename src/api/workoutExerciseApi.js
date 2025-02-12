@@ -1,35 +1,35 @@
 import axios from "axios";
+import dayjs from "dayjs";
 
 const API_URL = "http://localhost:3000/api/workout-exercises";
 
-//  Add an exercise to a workout
-export const addExerciseToWorkout = async (token, exerciseData, workoutId) => {
-    try {
-      const response = await axios.post(
-        `${API_URL}/add/${workoutId}`,  
-        exerciseData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error adding exercise:", error);
-      throw error;
-    }
-  };
+//  Fetch exercises for today's workout
+export const getTodaysWorkoutExercises = async (token) => {
+  try {
+    const today = dayjs().format("YYYY-MM-DD"); 
+    const response = await axios.get(`${API_URL}/byDate/${today}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-//  Get all exercises in a workout
-export const getWorkoutExercises = async (token, workoutId) => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/${workoutId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error getting exercises:", error);
-      throw error;
-    }
-  };
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching today's workout:", error);
+    throw error; 
+  }
+};
+
+// Add an exercise to today's workout (Backend auto-creates workout if needed)
+export const addExerciseToWorkout = async (token, exerciseData) => {
+  try {
+    const response = await axios.post(`${API_URL}/add`, exerciseData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data; //  Returns newly added exercise
+  } catch (error) {
+    console.error("Error adding exercise to workout:", error);
+    throw error;
+  }
+};
   
 
 //  Remove an exercise from a workout
