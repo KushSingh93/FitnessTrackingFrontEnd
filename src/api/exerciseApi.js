@@ -9,6 +9,7 @@ export const getAllExercises = async (token) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log("This is the ex" , response);
+    debugger;
     return response.data; // Return fetched exercises
   } catch (error) {
     console.error("Error fetching exercises:", error);
