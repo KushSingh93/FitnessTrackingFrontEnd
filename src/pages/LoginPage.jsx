@@ -3,7 +3,7 @@ import InputField from "../components/InputField.jsx";
 import Button from "../components/Button.jsx";
 import { login } from "../api/authApi.js";
 import { useNavigate } from "react-router-dom";
-import Logo from "../assets/ironLogLogo.png"; // ✅ Import the logo
+import Logo from "../assets/images/ironLogLogo.png"; 
 
 const LoginPage = () => {
   const navigate = useNavigate();

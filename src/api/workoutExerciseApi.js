@@ -18,6 +18,19 @@ export const getTodaysWorkoutExercises = async (token) => {
   }
 };
 
+export const getWorkoutExercisesByDate = async (token, date) => {
+  try {
+    const response = await axios.get(`${API_URL}/byDate/${date}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching workout by date:", error);
+    throw error;
+  }
+};
+
+
 // Add an exercise to today's workout (Backend auto-creates workout if needed)
 export const addExerciseToWorkout = async (token, exerciseData) => {
   try {

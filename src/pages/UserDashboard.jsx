@@ -17,6 +17,7 @@ import {
   getTodaysWorkoutExercises,
   addExerciseToWorkout,
   removeExerciseFromWorkout,
+  getWorkoutExercisesByDate,
 } from "../api/workoutExerciseApi";
 
 const UserDashboard = () => {
@@ -31,6 +32,8 @@ const UserDashboard = () => {
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
   const [streak, setStreak] = useState(8); // Streak Count
+  const [repeatWorkoutExercises, setRepeatWorkoutExercises] = useState([]);
+  const [isRepeatModalOpen, setIsRepeatModalOpen] = useState(false);
 
   //  Fetch Arsenal Exercises on Component Mount
   useEffect(() => {
@@ -89,12 +92,51 @@ const UserDashboard = () => {
     return mockWorkouts[formattedDate] || [];
   };
 
-  // 🔹 Handle Date Selection
-  const handleDateChange = (newDate) => {
+  //  Handle Date Selection
+  const handleDateChange = async (newDate) => {
     setSelectedDate(newDate);
-    const workout = getWorkoutForDate(newDate);
-    setTodaysWorkout(workout); // Load into Today's Workout
-    setShowDatePicker(false); // Close calendar after selection
+    setShowDatePicker(false); // Close calendar
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("User not authenticated.");
+        return;
+      }
+
+      // Format date for API request
+      const formattedDate = dayjs(newDate).format("YYYY-MM-DD");
+      const todayDate = dayjs().format("YYYY-MM-DD");
+
+      console.log("User selected date:", formattedDate);
+
+      if (formattedDate === todayDate) {
+        console.log("Fetching today's workout...");
+        const todaysWorkoutData = await getTodaysWorkoutExercises(token);
+        setTodaysWorkout(todaysWorkoutData);
+        setRepeatWorkoutExercises(todaysWorkoutData); // Open preview with today's workout
+      } else {
+        console.log("Fetching past workout...");
+        const pastWorkout = await getWorkoutExercisesByDate(
+          token,
+          formattedDate
+        );
+        console.log("Workout Data for Selected Date:", pastWorkout);
+
+        if (pastWorkout.length === 0) {
+          setRepeatWorkoutExercises([]); // Show "No exercises in this workout" message
+        } else {
+          setRepeatWorkoutExercises(pastWorkout);
+        }
+      }
+
+      setIsRepeatModalOpen(true); // Open preview modal
+    } catch (error) {
+      setError("Failed to load workout from the selected date.");
+      console.error("Error fetching workout:", error);
+      setRepeatWorkoutExercises([]); // Reset in case of an error
+      setIsRepeatModalOpen(true); // Open preview modal with error message
+    }
   };
 
   // Custom Exercise Inputs
@@ -190,7 +232,9 @@ const UserDashboard = () => {
       const exerciseData = {
         exerciseName: customName,
         bodyPart: customBodyPart,
-        caloriesBurntPerRep: isNaN(parseFloat(customCalories)) ? 0.0 : parseFloat(customCalories), // Ensure it's a number
+        caloriesBurntPerRep: isNaN(parseFloat(customCalories))
+          ? 0.0
+          : parseFloat(customCalories), // Ensure it's a number
       };
 
       const newExercise = await addCustomExercise(exerciseData, token); // Call API
@@ -281,6 +325,69 @@ const UserDashboard = () => {
     return b.favourite - a.favourite; // Keep favorites on top after filtering
   });
 
+  const RepeatWorkoutModal = ({ exercises, onClose, onCopy }) => {
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+        <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+          <h2 className="text-xl font-bold text-center mb-4">
+            Preview Workout
+          </h2>
+
+          {exercises.length === 0 ? (
+            <p className="text-gray-400 text-center">
+              No exercises in this workout.
+            </p>
+          ) : (
+            <ul className="mb-4">
+              {exercises.map((exercise, index) => (
+                <li key={index} className="bg-gray-700 p-3 rounded mb-2">
+                  {exercise.exerciseName} - {exercise.sets} sets,{" "}
+                  {exercise.reps} reps
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="flex justify-between">
+            <button
+              onClick={onClose}
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onCopy}
+              className={`px-4 py-2 rounded ${
+                exercises.length === 0
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-600 text-white"
+              }`}
+              disabled={exercises.length === 0}
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const handleCopyWorkout = () => {
+    console.log("Copying workout to today's workout...");
+
+    // Clear today's workout first
+    setTodaysWorkout([]);
+
+    //  Copy selected workout into today's workout with correct calorie calculations
+    const copiedWorkout = repeatWorkoutExercises.map((exercise) => ({
+      ...exercise,
+      caloriesBurntPerRep: Number(exercise.caloriesBurntPerRep), //  Ensures it's a valid number
+    }));
+
+    setTodaysWorkout(copiedWorkout);
+    setIsRepeatModalOpen(false); // Close modal
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
       {/* Streak Icon */}
@@ -288,7 +395,7 @@ const UserDashboard = () => {
         <div className="relative">
           {/* Flame Icon */}
           <img
-            src="/src/assets/fireFinal.png"
+            src="/src/assets/images/fireFinal.png"
             alt="Streak"
             className="w-12 h-12 drop-shadow-lg"
           />
@@ -303,7 +410,7 @@ const UserDashboard = () => {
       {/* Logo */}
       <div className="mt-6">
         <img
-          src="/src/assets/ironLogLogo.png"
+          src="/src/assets/images/ironLogLogo.png"
           alt="Iron Log"
           className="w-32 h-auto"
         />
@@ -434,8 +541,12 @@ const UserDashboard = () => {
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   value={selectedDate}
-                  onChange={handleDateChange}
-                  className="bg-white rounded p-2"
+                  onChange={(newDate) => {
+                    setSelectedDate(newDate);
+                    handleDateChange(newDate);
+                    setShowDatePicker(false);
+                  }}
+                  className="bg-white rounded p-2 w-full"
                 />
               </LocalizationProvider>
 
@@ -448,6 +559,13 @@ const UserDashboard = () => {
               </button>
             </div>
           </div>
+        )}
+        {isRepeatModalOpen && (
+          <RepeatWorkoutModal
+            exercises={repeatWorkoutExercises}
+            onClose={() => setIsRepeatModalOpen(false)}
+            onCopy={handleCopyWorkout} 
+          />
         )}
       </div>
 
