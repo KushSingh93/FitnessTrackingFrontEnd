@@ -103,17 +103,6 @@ const UserDashboard = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // 🔹 Mock function to get past workouts (Replace with API later)
-  const getWorkoutForDate = (date) => {
-    const mockWorkouts = {
-      "2025-02-08": [{ name: "Bench Press", sets: 3, reps: 10, calories: 5 }],
-      "2025-02-09": [{ name: "Deadlift", sets: 4, reps: 6, calories: 8 }],
-      "2025-02-10": [{ name: "Squats", sets: 3, reps: 12, calories: 6 }],
-    };
-
-    const formattedDate = dayjs(date).format("YYYY-MM-DD");
-    return mockWorkouts[formattedDate] || [];
-  };
 
   //  Handle Date Selection
   const handleDateChange = async (newDate) => {
@@ -214,10 +203,10 @@ const UserDashboard = () => {
         return;
       }
 
-      // ✅ Call backend API to remove exercise
+      // Call backend API to remove exercise
       await removeExerciseFromWorkout(token, workoutExerciseId);
 
-      // ✅ Update state: Remove exercise from UI immediately
+      //  Update state: Remove exercise from UI immediately
       setTodaysWorkout((prevWorkout) =>
         prevWorkout.filter(
           (exercise) => exercise.workoutExerciseId !== workoutExerciseId
@@ -278,7 +267,7 @@ const UserDashboard = () => {
   const [favoriteExercises, setFavoriteExercises] = useState(new Set()); // Store as a Set
   const token = localStorage.getItem("token");
 
-  // ✅ Fetch Favorites on Component Mount
+  //  Fetch Favorites on Component Mount
   useEffect(() => {
     // const fetchFavorites = async () => {
     //   if (!token) return;
@@ -308,7 +297,7 @@ const UserDashboard = () => {
     fetchExercises();
   }, []);
 
-  // ✅ Toggle Favorite
+  // Toggle Favorite
   const handleToggleFavorite = async (exercise) => {
     if (!token) {
       console.error("User not authenticated.");
@@ -528,16 +517,6 @@ const UserDashboard = () => {
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">Today's Workout</h2>
-            {todaysWorkout.length > 0 && (
-              <button
-                onClick={() => {
-                  /* Implement clear all function */
-                }}
-                className="text-red-500 hover:text-red-600 focus:outline-none"
-              >
-                Clear All
-              </button>
-            )}
           </div>
 
           {todaysWorkout.length === 0 ? (
