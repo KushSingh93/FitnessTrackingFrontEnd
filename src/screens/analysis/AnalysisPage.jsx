@@ -48,7 +48,7 @@ const AnalysisPage = () => {
         ]);
 
         setAnalysisData(summaryData);
-        setStreak(streakData.streakCount);
+        setStreak(streakData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -58,6 +58,14 @@ const AnalysisPage = () => {
 
     fetchData();
   }, [selectedPeriod]);
+
+  const handleStreakClick = () => {
+    if (streak && streak.startDate) {
+      alert(`🔥 Your streak started on: ${streak.startDate}`);
+    } else {
+      alert("🔥 No streak start date available.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center p-6 w-full">
@@ -77,17 +85,20 @@ const AnalysisPage = () => {
           <FaArrowLeft className="text-white text-lg" />
         </button>
 
-        {/* 🔥 Streak Icon */}
-        <div className="relative w-12 h-12">
+        {/* 🔥 Streak Icon as Clickable Button */}
+        <button
+          onClick={handleStreakClick}
+          className="relative w-12 h-12 focus:outline-none"
+        >
           <img
             src="/src/assets/images/fireFinal.png"
             alt="Streak"
             className="w-12 h-12 animate-pulse"
           />
           <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-lg">
-            {streak}
+            {streak?.streakCount || 0} 
           </span>
-        </div>
+        </button>
 
         {/* 📅 Timeline Dropdown */}
         <TimelineDropdown
