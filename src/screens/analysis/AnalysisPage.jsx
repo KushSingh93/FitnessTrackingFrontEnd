@@ -71,7 +71,7 @@ const AnalysisPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center p-6 w-full">
       {/* 🔙 Back Button + 🔥 Streak + Timeline Dropdown */}
       <div className="flex justify-between w-full container mx-auto px-12 items-center mb-6 relative">
-        {/* ✅ Back Button (Navigates to Dashboard) */}
+        {/*  Back Button (Navigates to Dashboard) */}
         <button
           onClick={() => navigate("/dashboard")}
           className="absolute left-0 top-0 p-2 bg-gray-700 bg-opacity-50 rounded-full hover:bg-gray-600 transition duration-200"
@@ -100,7 +100,7 @@ const AnalysisPage = () => {
           </span>
         </button>
 
-        {/* 📅 Timeline Dropdown */}
+        {/* Timeline Dropdown */}
         <TimelineDropdown
           selectedPeriod={selectedPeriod}
           setSelectedPeriod={setSelectedPeriod}
@@ -108,7 +108,7 @@ const AnalysisPage = () => {
         />
       </div>
 
-      {/* 📊 Workout Summary - Centered & More Visible */}
+      {/*  Workout Summary - Centered & More Visible */}
       {loading ? (
         <p className="text-gray-300 italic">
           Loading analysis... Please wait.{" "}
@@ -131,7 +131,7 @@ const AnalysisPage = () => {
             </p>
           </div>
 
-          {/* 📈 Charts Section */}
+          {/*  Charts Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full container mx-auto px-12">
             {/* Calories Chart Section */}
             <div className="bg-gray-800 bg-opacity-40 p-6 rounded-2xl shadow-lg w-full flex flex-col">

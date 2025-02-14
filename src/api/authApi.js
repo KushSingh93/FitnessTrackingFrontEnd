@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Base API URL
 const API_URL = "http://localhost:3000/api";
 
 //  Utility function to get JWT from local storage
@@ -9,7 +8,6 @@ const getAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-//  SIGNUP API
 export const signup = async (userData) => {
   try {
     const response = await axios.post(`${API_URL}/users/signup`, userData);
@@ -19,23 +17,19 @@ export const signup = async (userData) => {
   }
 };
 
-//  LOGIN API
 export const login = async (credentials) => {
     try {
       const response = await axios.post(`${API_URL}/users/login`, credentials);
   
-      //  Fix: Extract Token Properly
       const responseData = response.data;
-      console.log("Raw Response:", responseData); // Debugging
   
-      // Extract token from response (assuming it follows a pattern)
       const tokenMatch = responseData.match(/Token:\s(\S+)/);
       if (!tokenMatch) throw new Error("Token not found in response");
   
-      const token = tokenMatch[1]; // Extract actual token
+      const token = tokenMatch[1]; 
       console.log("Extracted Token:", token);
   
-      localStorage.setItem("token", token); // Store JWT token
+      localStorage.setItem("token", token); 
   
       return token;
     } catch (error) {
