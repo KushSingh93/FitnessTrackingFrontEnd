@@ -19,6 +19,7 @@ import {
   removeExerciseFromWorkout,
   getWorkoutExercisesByDate,
 } from "../api/workoutExerciseApi";
+import { getUserStreak } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
@@ -32,9 +33,30 @@ const UserDashboard = () => {
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
-  const [streak, setStreak] = useState(8); // Streak Count
+  const [streak, setStreak] = useState(0); // Streak Count
   const [repeatWorkoutExercises, setRepeatWorkoutExercises] = useState([]);
   const [isRepeatModalOpen, setIsRepeatModalOpen] = useState(false);
+
+  
+
+  useEffect(() => {
+    const fetchStreak = async () => {
+      try {
+        const token = localStorage.getItem("token"); 
+        if (!token) {
+          navigate("/login"); 
+          return;
+        }
+  
+        const data = await getUserStreak(token); 
+        setStreak(data.streakCount);
+      } catch (error) {
+        console.error("Error fetching streak:", error);
+      }
+    };
+  
+    fetchStreak();
+  }, []); 
 
   //  Fetch Arsenal Exercises on Component Mount
   useEffect(() => {
@@ -393,7 +415,7 @@ const UserDashboard = () => {
     }));
 
     // Save the copied workout to localStorage
-  localStorage.setItem("todaysWorkout", JSON.stringify(copiedWorkout));
+    localStorage.setItem("todaysWorkout", JSON.stringify(copiedWorkout));
 
     setTodaysWorkout(copiedWorkout);
     setIsRepeatModalOpen(false); // Close modal
@@ -753,9 +775,9 @@ const UserDashboard = () => {
       {/* User Profile (Bottom Right) */}
       <button
         className="absolute bottom-4 right-4 flex items-center bg-gray-800 p-3 rounded-lg shadow-lg rounded-full hover:bg-gray-700 transition duration-200"
-        onClick={() => console.log("Navigate to User Management Page")} // Replace with navigation logic later
+        onClick={() => navigate("/profile")}
       >
-        <FaUserCircle className="text-white text-3xl" /> {/* User icon */}
+        <FaUserCircle className="text-white text-3xl" />
       </button>
 
       {/* Analysis Button (Top Right) */}
