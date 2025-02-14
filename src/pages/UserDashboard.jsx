@@ -19,6 +19,7 @@ import {
   removeExerciseFromWorkout,
   getWorkoutExercisesByDate,
 } from "../api/workoutExerciseApi";
+import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
   const [arsenalExercises, setArsenalExercises] = useState([]);
@@ -146,7 +147,7 @@ const UserDashboard = () => {
   const [showBodyPartDropdown, setShowBodyPartDropdown] = useState(false);
 
   // Predefined body parts
-  const bodyParts = ["ARMS", "BACK", "CHEST", "SHOULDERS", "ABS", "LEGS"];
+  const bodyParts = ["ARMS", "BACK", "CHEST", "SHOULDER", "ABS", "LEGS"];
 
   //  Open Add Exercise Dialog when clicking "+"
   const handleAddExerciseClick = (exercise) => {
@@ -372,6 +373,13 @@ const UserDashboard = () => {
     );
   };
 
+  useEffect(() => {
+    const savedWorkout = localStorage.getItem("todaysWorkout");
+    if (savedWorkout) {
+      setTodaysWorkout(JSON.parse(savedWorkout));
+    }
+  }, []);
+
   const handleCopyWorkout = () => {
     console.log("Copying workout to today's workout...");
 
@@ -384,9 +392,20 @@ const UserDashboard = () => {
       caloriesBurntPerRep: Number(exercise.caloriesBurntPerRep), //  Ensures it's a valid number
     }));
 
+    // Save the copied workout to localStorage
+  localStorage.setItem("todaysWorkout", JSON.stringify(copiedWorkout));
+
     setTodaysWorkout(copiedWorkout);
     setIsRepeatModalOpen(false); // Close modal
   };
+
+  // Clear today's workout from state and localStorage
+  const clearTodaysWorkout = () => {
+    localStorage.removeItem("todaysWorkout");
+    setTodaysWorkout([]);
+  };
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
@@ -485,40 +504,81 @@ const UserDashboard = () => {
 
         {/* Today's Workout Section */}
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold mb-4">Today's Workout</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white">Today's Workout</h2>
+            {todaysWorkout.length > 0 && (
+              <button
+                onClick={() => {
+                  /* Implement clear all function */
+                }}
+                className="text-red-500 hover:text-red-600 focus:outline-none"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
+
           {todaysWorkout.length === 0 ? (
-            <p className="text-gray-400">No exercises added yet.</p>
+            <div className="text-gray-400 italic">
+              No exercises added yet. Let's get moving!
+            </div>
           ) : (
             <>
-              {todaysWorkout.map((exercise, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between bg-gray-700 p-3 rounded mb-2"
-                >
-                  <span>
-                    {exercise.exerciseName} - {exercise.sets} sets,{" "}
-                    {exercise.reps} reps -{" "}
-                    <span className="text-gray-400">
-                      {(
-                        (exercise.caloriesBurntPerRep || 0) *
-                        exercise.sets *
-                        exercise.reps
-                      ).toFixed(2)}{" "}
-                      kcal
-                    </span>
-                  </span>
-                  <button
-                    onClick={() =>
-                      handleRemoveFromWorkout(exercise.workoutExerciseId)
-                    }
-                    className="text-red-400 text-lg hover:text-red-500"
+              <ul className="space-y-3">
+                {todaysWorkout.map((exercise, index) => (
+                  <li
+                    key={index}
+                    className="bg-gray-700 rounded-md p-4 flex items-center justify-between hover:bg-gray-600 transition-colors duration-200"
                   >
-                    −
-                  </button>
-                </div>
-              ))}
-              <div className="mt-4 text-lg font-semibold text-green-400">
-                Total Calories Burned: {totalCalories} kcal
+                    <div>
+                      <div className="font-medium text-white">
+                        {exercise.exerciseName}
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        {exercise.sets} sets, {exercise.reps} reps
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-gray-400 mr-3">
+                        {(
+                          (exercise.caloriesBurntPerRep || 0) *
+                          exercise.sets *
+                          exercise.reps
+                        ).toFixed(2)}{" "}
+                        kcal
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleRemoveFromWorkout(exercise.workoutExerciseId)
+                        }
+                        className="text-red-400 hover:text-red-500 focus:outline-none"
+                        aria-label={`Remove ${exercise.exerciseName}`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-6 py-2 px-4 bg-gray-700 rounded-md flex justify-between items-center">
+                <span className="text-lg font-semibold text-white">
+                  Total Calories Burned:
+                </span>
+                <span className="text-2xl font-bold text-green-400">
+                  {totalCalories} kcal
+                </span>
               </div>
             </>
           )}
@@ -526,9 +586,23 @@ const UserDashboard = () => {
           {/* Repeat Workout Button */}
           <button
             onClick={() => setShowDatePicker(true)}
-            className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 text-white py-2 px-4 rounded-lg flex justify-center items-center transition-all duration-300 transform hover:scale-105"
+            className="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:bg-gradient-to-l hover:shadow-md text-white py-3 rounded-lg flex justify-center items-center transition-all duration-300"
           >
-            🔄 Repeat Workout
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 mr-2 animate-spin-slow"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.357-2A8.003 8.003 0 0119.417 15m0 0h-4m-1.273 0a2 2 0 11-3.142 0m-1.273 0A2 2 0 112.65 12"
+              />
+            </svg>
+            Repeat Workout
           </button>
         </div>
 
@@ -564,7 +638,7 @@ const UserDashboard = () => {
           <RepeatWorkoutModal
             exercises={repeatWorkoutExercises}
             onClose={() => setIsRepeatModalOpen(false)}
-            onCopy={handleCopyWorkout} 
+            onCopy={handleCopyWorkout}
           />
         )}
       </div>
@@ -684,12 +758,12 @@ const UserDashboard = () => {
         <FaUserCircle className="text-white text-3xl" /> {/* User icon */}
       </button>
 
-      {/* Analysis (Top Right) */}
+      {/* Analysis Button (Top Right) */}
       <button
         className="absolute top-4 right-4 flex items-center bg-gray-800 p-3 rounded-lg shadow-lg hover:bg-gray-700 transition duration-200"
-        onClick={() => console.log("Navigate to Analysis Page")} // Replace with navigation logic later
+        onClick={() => navigate("/analysis")}
       >
-        <FaChartBar className="text-white text-2xl" /> {/* Graph icon */}
+        <FaChartBar className="text-white text-2xl" />
       </button>
     </div>
   );
