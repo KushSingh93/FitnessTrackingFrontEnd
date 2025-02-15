@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:3000/api/reports";
+import { apiClient } from "../../lib/api"; // Import centralized API client
 
 export const getWorkoutSummary = async (token, period) => {
   try {
-    const response = await axios.get(`${API_URL}/summary`, {
+    const response = await apiClient.get(`/reports/summary`, {
       headers: { Authorization: `Bearer ${token}` },
       params: { period }, // weekly, monthly, yearly
     });

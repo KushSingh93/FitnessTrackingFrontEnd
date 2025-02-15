@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { getWorkoutSummary } from "../reportsApi";
+import { getWorkoutSummary } from "../api";
 import { getUserStreak } from "../../../api/userApi";
 import AnalysisComponent from "../components";
 import { useNavigate } from "react-router-dom";
