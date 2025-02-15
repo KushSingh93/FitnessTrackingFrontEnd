@@ -11,43 +11,21 @@ import {
   Legend,
 } from "chart.js";
 
-// ✅ Register ALL required Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
-const CaloriesChart = ({ data }) => {
-  if (!data || Object.keys(data).length === 0)
-    return (
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-        <h3 className="text-xl font-bold mb-2">Calories Burnt Over Time</h3>
-        <p className="text-gray-400">No data available</p>
-      </div>
-    );
+const CaloriesChart = ({ data, totalCalories }) => {
+  if (!data || Object.keys(data).length === 0) return <p className="text-gray-400 italic">No data available</p>;
 
-  // ✅ Sort dates in ascending order
-  const sortedData = Object.entries(data)
-    .sort((a, b) => new Date(a[0]) - new Date(b[0])) // Sort by date
-    .reduce((acc, [date, value]) => {
-      acc.labels.push(date);
-      acc.values.push(value);
-      return acc;
-    }, { labels: [], values: [] });
+  const sortedData = Object.entries(data).sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
   const chartData = {
-    labels: sortedData.labels, // Sorted Dates
+    labels: sortedData.map(([date]) => date),
     datasets: [
       {
         label: "Calories Burned",
-        data: sortedData.values,
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        data: sortedData.map(([, value]) => value),
+        borderColor: "rgba(0, 191, 255, 1)", // ✅ Clean blue line
+        backgroundColor: "rgba(0, 191, 255, 0.2)", // ✅ Subtle blue fill
         tension: 0.4, // ✅ Smooth curve
         fill: true,
         pointRadius: 5,
@@ -59,38 +37,36 @@ const CaloriesChart = ({ data }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { display: true },
-      title: { display: true, text: "Calories Burnt Over Time" },
-      tooltip: {
-        callbacks: {
-          label: (tooltipItem) => `${tooltipItem.raw} kcal`, // ✅ Show kcal unit
-        },
-      },
-    },
     scales: {
       y: {
-        beginAtZero: true,
+        beginAtZero: true, // ✅ Forces Y-axis to start from 0
         ticks: {
-          callback: (value) => `${value} kcal`, // ✅ Adds "kcal" to Y-axis
+          callback: (value) => `${value} kcal`,
         },
       },
       x: {
         ticks: {
-          autoSkip: true, // ✅ Prevents clutter on X-axis
+          autoSkip: true,
           maxRotation: 45,
           minRotation: 45,
         },
       },
     },
+    plugins: {
+      legend: { display: true },
+      title: { display: true, text: "Calories Burned Over Time" },
+    },
   };
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h3 className="text-xl font-bold mb-2">Calories Burnt Over Time</h3>
+      <h3 className="text-xl font-bold mb-2">Calories Burned Over Time</h3>
       <div style={{ height: "300px" }}>
         <Line data={chartData} options={options} />
       </div>
+      <p className="mt-4 text-xl text-green-400 font-semibold text-center">
+        Total Calories: <span className="text-green-300 ml-1">{totalCalories} kcal</span>
+      </p>
     </div>
   );
 };
