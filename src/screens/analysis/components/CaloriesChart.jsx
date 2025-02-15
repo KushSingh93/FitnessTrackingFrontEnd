@@ -11,12 +11,23 @@ import {
   Legend,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const CaloriesChart = ({ data, totalCalories }) => {
-  if (!data || Object.keys(data).length === 0) return <p className="text-gray-400 italic">No data available</p>;
+  if (!data || Object.keys(data).length === 0)
+    return <p className="text-gray-400 italic">No data available</p>;
 
-  const sortedData = Object.entries(data).sort((a, b) => new Date(a[0]) - new Date(b[0]));
+  const sortedData = Object.entries(data).sort(
+    (a, b) => new Date(a[0]) - new Date(b[0])
+  );
 
   const chartData = {
     labels: sortedData.map(([date]) => date),
@@ -53,8 +64,7 @@ const CaloriesChart = ({ data, totalCalories }) => {
       },
     },
     plugins: {
-      legend: { display: true },
-      title: { display: true, text: "Calories Burned Over Time" },
+      legend: { display: true }
     },
   };
 
@@ -64,8 +74,9 @@ const CaloriesChart = ({ data, totalCalories }) => {
       <div style={{ height: "300px" }}>
         <Line data={chartData} options={options} />
       </div>
-      <p className="mt-4 text-xl text-green-400 font-semibold text-center">
-        Total Calories: <span className="text-green-300 ml-1">{totalCalories} kcal</span>
+      <p className="mt-4 text-xl text-white font-semibold text-center">
+        Total Calories:{" "}
+        <span className="text-gray-300 ml-1">{totalCalories} kcal</span>
       </p>
     </div>
   );

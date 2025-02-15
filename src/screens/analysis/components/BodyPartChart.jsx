@@ -34,20 +34,20 @@ const BodyPartChart = ({ data, mostTrainedBodyPart }) => {
       x: { ticks: { autoSkip: false } },
     },
     plugins: {
-      legend: { display: false },
-      title: { display: true, text: "Most Trained Body Parts" },
+      legend: { display: false }
     },
   };
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h3 className="text-xl font-bold mb-2">Most Trained Body Parts</h3>
+      <h3 className="text-xl font-bold mb-2">Sets Per Body Part</h3>
       <div style={{ height: "300px" }}>
         <Bar data={chartData} options={options} />
       </div>
-      <p className="mt-4 text-xl text-blue-400 font-semibold text-center">
-        Most Trained Body Part: <span className="text-blue-300 ml-1">{mostTrainedBodyPart}</span>
-      </p>
+      <p className="mt-4 text-xl text-white font-semibold text-center">
+  Most Trained Body Part: <span className="text-gray-300 ml-1">{mostTrainedBodyPart}</span>
+</p>
+
     </div>
   );
 };
