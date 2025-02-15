@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { getWorkoutSummary } from "../api";
-import { getUserStreak } from "../../../api/userApi";
+import { getUserStreak } from "../../profile/api";
 import AnalysisComponent from "../components";
 import { useNavigate } from "react-router-dom";
 

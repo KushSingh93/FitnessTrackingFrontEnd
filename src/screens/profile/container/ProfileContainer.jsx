@@ -1,0 +1,118 @@
+import React, { Component } from "react";
+import { getUserProfile, updateUserProfile, logoutUser } from "../api";
+import { ProfileDetails, EditProfileForm } from "../components";
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+class ProfileContainer extends Component {
+  state = {
+    userData: null,
+    formData: {},
+    isEditing: false,
+    loading: true,
+    error: "",
+  };
+
+  async componentDidMount() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      this.props.navigate("/login");
+      return;
+    }
+
+    try {
+      const data = await getUserProfile(token);
+      this.setState({
+        userData: data,
+        formData: {
+          name: data.name || "",
+          age: data.age || "",
+          weightKg: data.weightKg || "",
+          heightCm: data.heightCm || "",
+          gender: data.gender || "MALE",
+        },
+        loading: false,
+      });
+    } catch (error) {
+      this.setState({ error: "Failed to fetch user profile.", loading: false });
+    }
+  }
+
+  handleChange = (e) => {
+    this.setState({ isEditing: true, formData: { ...this.state.formData, [e.target.name]: e.target.value } });
+  };
+
+  calculateBMI = () => {
+    const { weightKg, heightCm } = this.state.formData;
+    if (!weightKg || !heightCm) return "N/A";
+    const heightM = heightCm / 100;
+    return (weightKg / (heightM * heightM)).toFixed(1);
+  };
+
+  getBMICategory = () => {
+    const bmi = this.calculateBMI();
+    if (bmi === "N/A") return "N/A";
+    if (bmi < 18.5) return "Underweight 🟡";
+    if (bmi < 25) return "Normal Weight ✅";
+    if (bmi < 30) return "Overweight 🟠";
+    return "Obese 🔴";
+  };
+
+  handleUpdate = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await updateUserProfile(token, this.state.formData);
+      this.setState({ userData: { ...this.state.userData, ...this.state.formData }, isEditing: false });
+    } catch (error) {
+      this.setState({ error: "Failed to update profile." });
+    }
+  };
+
+  handleLogout = () => {
+    logoutUser();
+    localStorage.removeItem("token");  // ✅ Ensure token is removed
+    this.props.navigate("/login");  // ✅ Redirect user after logout
+  };
+
+  render() {
+    const { userData, formData, isEditing, loading, error } = this.state;
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
+        {/* Back Button */}
+        <button
+          className="absolute top-4 left-4 bg-gray-800 p-3 rounded-full hover:bg-gray-700 transition duration-200"
+          onClick={() => this.props.navigate("/dashboard")}
+        >
+          <FaArrowLeft className="text-white text-xl" />
+        </button>
+
+        {loading ? (
+          <p>Loading profile...</p>
+        ) : error ? (
+          <p className="text-red-400">{error}</p>
+        ) : isEditing ? (
+          <EditProfileForm
+            formData={formData}
+            handleChange={this.handleChange}
+            calculateBMI={this.calculateBMI}
+            getBMICategory={this.getBMICategory}
+            handleSave={this.handleUpdate}
+          />
+        ) : (
+          <ProfileDetails 
+            userData={userData} 
+            onEdit={() => this.setState({ isEditing: true })} 
+            handleLogout={this.handleLogout} 
+            calculateBMI={this.calculateBMI}   // ✅ Pass BMI function
+            getBMICategory={this.getBMICategory}  // ✅ Pass BMI category function
+          />
+        )}
+      </div>
+    );
+  }
+}
+
+export default function ProfileContainerWithNavigation() {
+  const navigate = useNavigate();
+  return <ProfileContainer navigate={navigate} />;
+}

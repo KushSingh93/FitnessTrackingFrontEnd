@@ -19,7 +19,7 @@ import {
   removeExerciseFromWorkout,
   getWorkoutExercisesByDate,
 } from "../api/workoutExerciseApi";
-import { getUserStreak } from "../api/userApi";
+import { getUserStreak } from "../screens/profile/api";
 import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
