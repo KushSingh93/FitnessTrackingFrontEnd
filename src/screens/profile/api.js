@@ -1,22 +1,22 @@
 import { apiClient } from "../../lib/api";
 
-// ✅ Fetch User Profile
+//  Fetch User Profile
 export const getUserProfile = async (token) => 
   apiClient.get("/users/profile", { headers: { Authorization: `Bearer ${token}` } })
   .then(res => res.data);
 
-// ✅ Update User Profile
+//  Update User Profile
 export const updateUserProfile = async (token, data) => 
   apiClient.put("/users/profile", data, { headers: { Authorization: `Bearer ${token}` } })
   .then(res => res.data);
 
-// ✅ Logout User
+//  Logout User
 export const logoutUser = () => {
     localStorage.removeItem("token");  
     window.location.href = "/login";  
 };
 
-// ✅ Fetch User Streak
+// Fetch User Streak
 export const getUserStreak = async (token) => 
   apiClient.get("/streaks/getStreak", { headers: { Authorization: `Bearer ${token}` } })
   .then(res => res.data)
