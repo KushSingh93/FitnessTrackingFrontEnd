@@ -1,11 +1,9 @@
 import { apiClient } from "../../../lib/api";
 
 // Fetch all exercises for the authenticated user
-export const getAllExercises = async (token) => {
+export const getAllExercises = async () => {
   try {
-    const response = await apiClient.get("/exercises/getAllExercises", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.get("/exercises/getAllExercises");
     console.log("Fetched Exercises:", response.data);
     return response.data;
   } catch (error) {
@@ -15,11 +13,9 @@ export const getAllExercises = async (token) => {
 };
 
 // Add Custom Exercise API
-export const addCustomExercise = async (exerciseData, token) => {
+export const addCustomExercise = async (exerciseData) => {
   try {
-    const response = await apiClient.post("/exercises/addExercise", exerciseData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.post("/exercises/addExercise", exerciseData);
     return response.data;
   } catch (error) {
     console.error("Error adding custom exercise:", error);

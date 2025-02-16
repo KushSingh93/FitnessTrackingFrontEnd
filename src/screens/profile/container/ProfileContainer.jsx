@@ -3,6 +3,7 @@ import { getUserProfile, updateUserProfile, logoutUser } from "../api";
 import { ProfileDetails, EditProfileForm } from "../components";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie'; // Import js-cookie
 
 class ProfileContainer extends Component {
   state = {
@@ -14,14 +15,14 @@ class ProfileContainer extends Component {
   };
 
   async componentDidMount() {
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token"); // Get token from cookie
     if (!token) {
       this.props.navigate("/login");
       return;
     }
 
     try {
-      const data = await getUserProfile(token);
+      const data = await getUserProfile(); 
       this.setState({
         userData: data,
         formData: {
@@ -63,8 +64,7 @@ class ProfileContainer extends Component {
 
   handleUpdate = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await updateUserProfile(token, this.state.formData);
+      await updateUserProfile(this.state.formData); // No token needed here
       this.setState({
         userData: { ...this.state.userData, ...this.state.formData },
         isEditing: false,
@@ -76,12 +76,13 @@ class ProfileContainer extends Component {
 
   handleLogout = () => {
     logoutUser();
-    localStorage.removeItem("token");
+    Cookies.remove('token', { path: '/' }); // Remove the token cookie
     this.props.navigate("/login");
   };
 
   render() {
     const { userData, formData, isEditing, loading, error } = this.state;
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center justify-center p-6">
         {/* Back Button */}

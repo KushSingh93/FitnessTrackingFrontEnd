@@ -2,12 +2,10 @@ import { apiClient } from "../../../lib/api";
 import dayjs from "dayjs";
 
 // Fetch exercises for today's workout
-export const getTodaysWorkoutExercises = async (token) => {
+export const getTodaysWorkoutExercises = async () => {
   try {
     const today = dayjs().format("YYYY-MM-DD");
-    const response = await apiClient.get(`/workout-exercises/byDate/${today}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.get(`/workout-exercises/byDate/${today}`);
 
     return response.data;
   } catch (error) {
@@ -17,11 +15,9 @@ export const getTodaysWorkoutExercises = async (token) => {
 };
 
 // Fetch workout exercises by selected date
-export const getWorkoutExercisesByDate = async (token, date) => {
+export const getWorkoutExercisesByDate = async (date) => {
   try {
-    const response = await apiClient.get(`/workout-exercises/byDate/${date}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.get(`/workout-exercises/byDate/${date}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching workout by date:", error);
@@ -30,11 +26,9 @@ export const getWorkoutExercisesByDate = async (token, date) => {
 };
 
 // Add an exercise to today's workout (Backend auto-creates workout if needed)
-export const addExerciseToWorkout = async (token, exerciseData) => {
+export const addExerciseToWorkout = async (exerciseData) => {
   try {
-    const response = await apiClient.post("/workout-exercises/add", exerciseData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.post("/workout-exercises/add", exerciseData);
     return response.data; // Returns newly added exercise
   } catch (error) {
     console.error("Error adding exercise to workout:", error);
@@ -43,11 +37,9 @@ export const addExerciseToWorkout = async (token, exerciseData) => {
 };
 
 // Remove an exercise from a workout
-export const removeExerciseFromWorkout = async (token, workoutExerciseId) => {
+export const removeExerciseFromWorkout = async (workoutExerciseId) => {
   try {
-    await apiClient.delete(`/workout-exercises/remove/${workoutExerciseId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await apiClient.delete(`/workout-exercises/remove/${workoutExerciseId}`);
   } catch (error) {
     console.error("Error removing exercise:", error);
     throw error;

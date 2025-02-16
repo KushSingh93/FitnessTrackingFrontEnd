@@ -1,9 +1,8 @@
 import { apiClient } from "../../lib/api"; // Import centralized API client
 
-export const getWorkoutSummary = async (token, period) => {
+export const getWorkoutSummary = async (period) => {
   try {
     const response = await apiClient.get(`/reports/summary`, {
-      headers: { Authorization: `Bearer ${token}` },
       params: { period }, // weekly, monthly, yearly
     });
     return response.data;

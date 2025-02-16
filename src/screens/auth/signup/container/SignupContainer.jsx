@@ -3,6 +3,7 @@ import { signup } from "../api";
 import SignupForm from "../components/SignupForm";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../../assets/images/ironLogLogo.png";
+import Cookies from 'js-cookie'; // Import js-cookie
 
 class SignupContainer extends Component {
   state = {
@@ -22,16 +23,17 @@ class SignupContainer extends Component {
     const { name, email, password } = this.state;
 
     try {
+      // Send the correct payload structure
       const response = await signup({
-        name: { name },
-        email: { email },
-        password: { password },
+        name,
+        email,
+        password,
       });
 
       const token = response.token || response.data?.token;
 
       if (token) {
-        localStorage.setItem("token", token);
+        Cookies.set('token', token, { expires: 7, path: '/' }); // Store token in cookie
         console.log("Signup successful, Token stored:", token);
         this.props.navigate("/login");
       } else {

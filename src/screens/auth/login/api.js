@@ -1,4 +1,5 @@
-import { apiClient } from "../../../lib/api";  
+import { apiClient } from "../../../lib/api";
+import Cookies from 'js-cookie'; // Import js-cookie
 
 export const login = async (credentials) => {
   try {
@@ -12,8 +13,9 @@ export const login = async (credentials) => {
 
     const token = tokenMatch[1]; 
 
-    localStorage.setItem("token", token);
-    console.log("Token stored in localStorage:", localStorage.getItem("token")); 
+    // Store the token in cookies instead of local storage
+    Cookies.set('token', token, { expires: 7, path: '/' }); // Set cookie with an expiration of 7 days
+    console.log("Token stored in cookies:", Cookies.get('token')); 
 
     return token; 
   } catch (error) {

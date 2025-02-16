@@ -44,7 +44,7 @@ const UserDashboardView = ({
   onCustomBodyPartChange,
   onCustomCaloriesChange,
   onCloseCustomDialog,
-  onAddCustomExerciseSubmit, // Changed from onAddCustomExercise
+  onAddCustomExerciseSubmit,
   onCopyWorkout,
   onCloseRepeatModal,
   handleDateChange,
@@ -77,6 +77,7 @@ const UserDashboardView = ({
           </div>
         </Tippy>
       </div>
+
       {/* Analysis Button */}
       <Tippy content="Analysis" placement="bottom">
         <button
@@ -120,7 +121,7 @@ const UserDashboardView = ({
               />
             </LocalizationProvider>
             <button
-              onClick={() => onRepeatWorkout(false)}
+              onClick={() => onRepeatWorkout(false)} // Close the date picker
               className="w-full mt-4 bg-red-500 text-white px-4 py-2 rounded-lg"
             >
               Close
@@ -133,7 +134,7 @@ const UserDashboardView = ({
       {isRepeatModalOpen && (
         <RepeatWorkoutModal
           exercises={repeatWorkoutExercises}
-          onClose={onCloseRepeatModal}
+          onClose={onCloseRepeatModal} // Pass the correct function
           onCopy={onCopyWorkout}
         />
       )}
@@ -205,7 +206,7 @@ const UserDashboardView = ({
                 Close
               </button>
               <button
-                onClick={onAddCustomExerciseSubmit} // Changed from onAddCustomExercise
+                onClick={onAddCustomExerciseSubmit}
                 className="bg-blue-500 text-white px-4 py-2 rounded-lg"
               >
                 Add Exercise

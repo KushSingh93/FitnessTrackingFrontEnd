@@ -23,7 +23,7 @@ class UserDashboardContainer extends Component {
     searchQuery: "",
     dialogOpen: false,
     customDialogOpen: false,
-    showDatePicker: false,
+    showDatePicker: false, // Controls the visibility of the date picker modal
     isRepeatModalOpen: false,
     selectedExercise: null,
     selectedDate: null,
@@ -40,18 +40,14 @@ class UserDashboardContainer extends Component {
 
   async componentDidMount() {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/login";
-        return;
-      }
+      this.setState({ loading: true });
 
       const [exercises, todaysWorkout, streakData, favoriteExercises] =
         await Promise.all([
-          getAllExercises(token),
-          getTodaysWorkoutExercises(token),
-          getUserStreak(token),
-          getFavoriteExercises(token),
+          getAllExercises(),
+          getTodaysWorkoutExercises(),
+          getUserStreak(),
+          getFavoriteExercises(),
         ]);
 
       this.setState({
@@ -65,6 +61,17 @@ class UserDashboardContainer extends Component {
       this.setState({ error: "Failed to fetch data", loading: false });
     }
   }
+
+  // Function to handle showing/hiding the date picker modal
+  onRepeatWorkout = (shouldShow) => {
+    console.log("onRepeatWorkout called with:", shouldShow); // Debugging
+    this.setState({ showDatePicker: shouldShow });
+  };
+
+  // Function to close the repeat workout modal
+  onCloseRepeatModal = () => {
+    this.setState({ isRepeatModalOpen: false });
+  };
 
   handleOpenCustomExerciseDialog = () =>
     this.setState({ customDialogOpen: true });
@@ -83,14 +90,13 @@ class UserDashboardContainer extends Component {
     if (!customName || !customBodyPart || !customCalories) return;
 
     try {
-      const token = localStorage.getItem("token");
       const exerciseData = {
         exerciseName: customName,
         bodyPart: customBodyPart,
         caloriesBurntPerRep: parseFloat(customCalories),
       };
 
-      const newExercise = await addCustomExercise(exerciseData, token);
+      const newExercise = await addCustomExercise(exerciseData);
       this.setState({
         arsenalExercises: [...arsenalExercises, newExercise],
         customDialogOpen: false,
@@ -108,18 +114,13 @@ class UserDashboardContainer extends Component {
     const { selectedExercise, sets, reps, todaysWorkout } = this.state;
     if (!selectedExercise || !sets || !reps) return;
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      this.setState({ error: "User not authenticated." });
-      return;
-    }
     const exerciseData = {
       exerciseId: selectedExercise.exerciseId,
       sets: parseInt(sets),
       reps: parseInt(reps),
     };
     try {
-      const newExercise = await addExerciseToWorkout(token, exerciseData);
+      const newExercise = await addExerciseToWorkout(exerciseData);
       this.setState({
         todaysWorkout: [...todaysWorkout, newExercise],
         dialogOpen: false,
@@ -135,19 +136,12 @@ class UserDashboardContainer extends Component {
   handleRemoveExercise = async (workoutExerciseId) => {
     const { todaysWorkout } = this.state;
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      this.setState({ error: "User not authenticated." });
-      return;
-    }
-
     try {
-      await removeExerciseFromWorkout(token, workoutExerciseId);
+      await removeExerciseFromWorkout(workoutExerciseId);
       const updatedWorkout = todaysWorkout.filter(
         (exercise) => exercise.workoutExerciseId !== workoutExerciseId
       );
       this.setState({ todaysWorkout: updatedWorkout });
-
       console.log("Exercise removed successfully.");
     } catch (error) {
       console.error("Failed to remove exercise from workout:", error);
@@ -159,15 +153,9 @@ class UserDashboardContainer extends Component {
     this.setState({ selectedDate: newDate, showDatePicker: false });
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        this.setState({ error: "User not authenticated." });
-        return;
-      }
-
       const formattedDate = newDate.format("YYYY-MM-DD");
 
-      const pastWorkout = await getWorkoutExercisesByDate(token, formattedDate);
+      const pastWorkout = await getWorkoutExercisesByDate(formattedDate);
       this.setState({
         repeatWorkoutExercises: pastWorkout.length ? pastWorkout : [],
         isRepeatModalOpen: true,
@@ -180,19 +168,12 @@ class UserDashboardContainer extends Component {
   handleCopyWorkout = async () => {
     console.log("Copying workout to today's workout...");
 
-    // Retrieve the token from localStorage
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found. User is not authenticated.");
-      return;
-    }
-
     const { repeatWorkoutExercises } = this.state;
 
     // Clear today's workout on the backend
     try {
       const today = dayjs().format("YYYY-MM-DD");
-      const todaysWorkoutExercises = await getTodaysWorkoutExercises(token);
+      const todaysWorkoutExercises = await getTodaysWorkoutExercises();
 
       // Ensure todaysWorkoutExercises is an array
       if (!Array.isArray(todaysWorkoutExercises)) {
@@ -202,7 +183,7 @@ class UserDashboardContainer extends Component {
 
       // Delete each exercise
       for (const exercise of todaysWorkoutExercises) {
-        await removeExerciseFromWorkout(token, exercise.workoutExerciseId); // Use workoutExerciseId
+        await removeExerciseFromWorkout(exercise.workoutExerciseId); // Use workoutExerciseId
       }
     } catch (error) {
       console.error("Error clearing today's workout:", error);
@@ -217,14 +198,12 @@ class UserDashboardContainer extends Component {
       }));
 
       for (const exercise of copiedWorkout) {
-        await addExerciseToWorkout(token, {
+        await addExerciseToWorkout({
           ...exercise,
           date: dayjs().format("YYYY-MM-DD"),
         });
       }
 
-      // Update frontend state and localStorage
-      localStorage.setItem("todaysWorkout", JSON.stringify(copiedWorkout));
       this.setState({ todaysWorkout: copiedWorkout, isRepeatModalOpen: false });
 
       console.log("Workout copied successfully!");
@@ -235,8 +214,6 @@ class UserDashboardContainer extends Component {
 
   handleToggleFavorite = async (exercise) => {
     const { favoriteExercises } = this.state;
-    const token = localStorage.getItem("token");
-    if (!token) return;
 
     const updatedFavorites = new Set(favoriteExercises);
     const isFavorite = updatedFavorites.has(exercise.exerciseId);
@@ -250,9 +227,9 @@ class UserDashboardContainer extends Component {
 
     try {
       if (isFavorite) {
-        await removeFromFavorites(token, exercise.exerciseId);
+        await removeFromFavorites(exercise.exerciseId);
       } else {
-        await addToFavorites(token, exercise.exerciseId);
+        await addToFavorites(exercise.exerciseId);
       }
     } catch (error) {
       console.error("Failed to update favorite:", error);
@@ -268,14 +245,14 @@ class UserDashboardContainer extends Component {
       searchQuery,
       dialogOpen,
       customDialogOpen,
+      showDatePicker,
+      isRepeatModalOpen,
       selectedExercise,
+      selectedDate,
+      repeatWorkoutExercises,
       sets,
       reps,
       streak,
-      repeatWorkoutExercises,
-      isRepeatModalOpen,
-      showDatePicker,
-      selectedDate,
       customName,
       customBodyPart,
       customCalories,
@@ -317,7 +294,8 @@ class UserDashboardContainer extends Component {
         onAddCustomExercise={this.handleOpenCustomExerciseDialog}
         onToggleFavorite={this.handleToggleFavorite}
         onRemoveExercise={this.handleRemoveExercise}
-        onRepeatWorkout={() => this.setState({ showDatePicker: true })}
+        onRepeatWorkout={this.onRepeatWorkout} // Updated to handle both open and close
+        onCloseRepeatModal={this.onCloseRepeatModal}
         onDateSelect={this.handleDateChange}
         onSetsChange={(e) => this.setState({ sets: e.target.value })}
         onRepsChange={(e) => this.setState({ reps: e.target.value })}
@@ -335,7 +313,6 @@ class UserDashboardContainer extends Component {
         onCloseCustomDialog={this.handleCloseCustomDialog}
         onAddCustomExerciseSubmit={this.handleAddCustomExercise}
         onCopyWorkout={this.handleCopyWorkout}
-        onCloseRepeatModal={() => this.setState({ isRepeatModalOpen: false })}
         handleDateChange={this.handleDateChange}
         handleCloseCustomDialog={this.handleCloseCustomDialog}
         bodyParts={bodyParts}

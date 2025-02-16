@@ -1,40 +1,32 @@
-import { apiClient } from "../../../lib/api"; 
+import { apiClient } from "../../../lib/api";
 const API_URL = "/favorites";
 
-export const getFavoriteExercises = async (token) => {
-    try {
-      const response = await apiClient.get("/favorites", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      console.log("Fetched Favorite Exercises:", response.data); 
-  
+export const getFavoriteExercises = async () => {
+  try {
+    const response = await apiClient.get("/favorites");
 
-      return response.data.map((fav) => fav.exercise.exerciseId); 
-    } catch (error) {
-      console.error("Error fetching favorite exercises:", error);
-      return [];
-    }
-  };
-  
+    console.log("Fetched Favorite Exercises:", response.data);
+
+    return response.data.map((fav) => fav.exercise.exerciseId);
+  } catch (error) {
+    console.error("Error fetching favorite exercises:", error);
+    return [];
+  }
+};
 
 //  Add Favorite Exercise (Already Correct)
-export const addToFavorites = async (token, exerciseId) => {
+export const addToFavorites = async (exerciseId) => {
   try {
-    await apiClient.post(`${API_URL}/add`, { exerciseId }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await apiClient.post(`${API_URL}/add`, { exerciseId });
   } catch (error) {
     console.error("Error adding favorite exercise:", error);
   }
 };
 
 // Remove Favorite Exercise (Fixed)
-export const removeFromFavorites = async (token, favExerciseId) => {
+export const removeFromFavorites = async (favExerciseId) => {
   try {
-    await apiClient.delete(`${API_URL}/remove/${favExerciseId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await apiClient.delete(`${API_URL}/remove/${favExerciseId}`);
   } catch (error) {
     console.error("Error removing favorite exercise:", error);
   }

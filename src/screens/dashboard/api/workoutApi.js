@@ -1,11 +1,9 @@
 import { apiClient } from "../../../lib/api";
 
 // Create a New Workout
-export const createWorkout = async (token, workoutData) => {
+export const createWorkout = async (workoutData) => {
   try {
-    const response = await apiClient.post("/workouts/createWorkout", workoutData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.post("/workouts/createWorkout", workoutData);
     return response.data;
   } catch (error) {
     console.error("Error creating workout:", error);
@@ -14,11 +12,9 @@ export const createWorkout = async (token, workoutData) => {
 };
 
 // Fetch User Workouts
-export const getUserWorkouts = async (token) => {
+export const getUserWorkouts = async () => {
   try {
-    const response = await apiClient.get("/workouts/userWorkout", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.get("/workouts/userWorkout");
     return response.data;
   } catch (error) {
     console.error("Error getting user workouts:", error);

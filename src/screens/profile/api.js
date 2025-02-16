@@ -1,26 +1,41 @@
 import { apiClient } from "../../lib/api";
+import Cookies from 'js-cookie';
 
 //  Fetch User Profile
-export const getUserProfile = async (token) => 
-  apiClient.get("/users/profile", { headers: { Authorization: `Bearer ${token}` } })
-  .then(res => res.data);
+export const getUserProfile = async () => {
+  try {
+    const response = await apiClient.get("/users/profile");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    throw error;
+  }
+};
 
 //  Update User Profile
-export const updateUserProfile = async (token, data) => 
-  apiClient.put("/users/profile", data, { headers: { Authorization: `Bearer ${token}` } })
-  .then(res => res.data);
+export const updateUserProfile = async (data) => {
+  try {
+    const response = await apiClient.put("/users/profile", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    throw error;
+  }
+};
 
 //  Logout User
 export const logoutUser = () => {
-    localStorage.removeItem("token");  
-    window.location.href = "/login";  
+  Cookies.remove('token', { path: '/' }); // Remove the token cookie
+  window.location.href = "/login";
 };
 
 // Fetch User Streak
-export const getUserStreak = async (token) => 
-  apiClient.get("/streaks/getStreak", { headers: { Authorization: `Bearer ${token}` } })
-  .then(res => res.data)
-  .catch(error => {
+export const getUserStreak = async () => {
+  try {
+    const response = await apiClient.get("/streaks/getStreak");
+    return response.data;
+  } catch (error) {
     console.error("Error fetching streak:", error);
     return { streakCount: 0, startDate: null }; // Default response on error
-  });
+  }
+};

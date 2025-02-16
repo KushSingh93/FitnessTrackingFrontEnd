@@ -3,6 +3,7 @@ import { getWorkoutSummary } from "../api";
 import { getUserStreak } from "../../profile/api";
 import AnalysisComponent from "../components";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie'; // Import js-cookie
 
 class AnalysisContainer extends Component {
   constructor(props) {
@@ -28,17 +29,11 @@ class AnalysisContainer extends Component {
 
   fetchData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        this.setState({ error: "User not authenticated.", loading: false });
-        return;
-      }
-
       this.setState({ loading: true });
 
       const [summaryData, streakData] = await Promise.all([
-        getWorkoutSummary(token, this.state.selectedPeriod),
-        getUserStreak(token),
+        getWorkoutSummary(this.state.selectedPeriod), 
+        getUserStreak(), 
       ]);
 
       this.setState({
