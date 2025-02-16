@@ -131,7 +131,7 @@ const WorkoutModals = ({
         </div>
       )}
 
-      {/*  Repeat Workout Modal */}
+      {/* Repeat Workout Modal */}
       {isRepeatModalOpen && (
         <RepeatWorkoutModal
           exercises={repeatWorkoutExercises}

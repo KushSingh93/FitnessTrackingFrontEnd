@@ -15,6 +15,7 @@ const AnalysisComponent = ({
 }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center p-6 w-full">
+        
       {/* Header Section */}
       <div className="flex justify-between w-full container mx-auto px-12 items-center mb-6 relative">
         <button

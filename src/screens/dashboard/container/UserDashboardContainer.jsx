@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { getAllExercises, addCustomExercise } from "../api/exerciseApi";
-import { FaUserCircle, FaChartBar } from "react-icons/fa";
+import {
+  FaUserCircle,
+  FaChartBar,
+} from "react-icons/fa";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -190,28 +193,28 @@ class UserDashboardContainer extends Component {
 
   handleCopyWorkout = async () => {
     console.log("Copying workout to today's workout...");
-  
+
     // Retrieve the token from localStorage
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("No token found. User is not authenticated.");
       return;
     }
-  
+
     const { repeatWorkoutExercises } = this.state;
-  
+
     // Clear today's workout on the backend
     try {
       const today = dayjs().format("YYYY-MM-DD");
       const todaysWorkoutExercises = await getTodaysWorkoutExercises(token); // Fetch today's exercises
       console.log("Today's Workout Exercises:", todaysWorkoutExercises); // Debugging: Log the exercises
-  
+
       // Ensure todaysWorkoutExercises is an array
       if (!Array.isArray(todaysWorkoutExercises)) {
         console.error("Expected an array but got:", todaysWorkoutExercises);
         return;
       }
-  
+
       // Delete each exercise
       for (const exercise of todaysWorkoutExercises) {
         await removeExerciseFromWorkout(token, exercise.workoutExerciseId); // Use workoutExerciseId
@@ -220,25 +223,25 @@ class UserDashboardContainer extends Component {
       console.error("Error clearing today's workout:", error);
       return;
     }
-  
+
     // Copy the selected day's workout to today's workout on the backend
     try {
       const copiedWorkout = repeatWorkoutExercises.map((exercise) => ({
         ...exercise,
         caloriesBurntPerRep: Number(exercise.caloriesBurntPerRep),
       }));
-  
+
       for (const exercise of copiedWorkout) {
         await addExerciseToWorkout(token, {
           ...exercise,
           date: dayjs().format("YYYY-MM-DD"),
         });
       }
-  
+
       // Update frontend state and localStorage
       localStorage.setItem("todaysWorkout", JSON.stringify(copiedWorkout));
       this.setState({ todaysWorkout: copiedWorkout, isRepeatModalOpen: false });
-  
+
       console.log("Workout copied successfully!");
     } catch (error) {
       console.error("Error copying workout to today's workout:", error);
@@ -295,8 +298,25 @@ class UserDashboardContainer extends Component {
 
     const bodyParts = ["ARMS", "BACK", "LEGS", "SHOULDER", "CHEST", "ABS"];
 
+    const bodyPartIcons = {
+      chest: "/src/assets/images/chest.png", // Path to your chest icon
+      legs: "/src/assets/images/legs.png", // Path to your legs icon
+      arms: "/src/assets/images/arms.png", // Path to your arms icon
+      back: "/src/assets/images/back.png", // Path to your back icon
+      abs: "/src/assets/images/abs.png", // Path to your abs icon
+      shoulder: "/src/assets/images/shoulder.png", // Path to your shoulder icon
+    };
+
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
+        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
+        {/* Logo */}
+        <div className="w-full text-center mb-8 mt-4">
+          <img
+            src="/src/assets/images/ironLogLogo.png"
+            alt="Iron Log Logo"
+            className="h-20 mx-auto"
+          />
+        </div>
         {/* Streak Display */}
         <div className="absolute top-4 left-4 flex justify-center items-center">
           <div className="relative">
@@ -330,6 +350,7 @@ class UserDashboardContainer extends Component {
             onAddExercise={this.handleAddExerciseClick}
             onAddCustomExercise={this.handleOpenCustomExerciseDialog}
             onToggleFavorite={this.handleToggleFavorite}
+            bodyPartIcons={bodyPartIcons} // Pass the icons as a prop
           />
 
           <TodaysWorkout
@@ -464,7 +485,7 @@ class UserDashboardContainer extends Component {
           className="absolute bottom-4 right-4 bg-gray-800 p-3 rounded-lg shadow-lg hover:bg-gray-700 transition"
           onClick={() => (window.location.href = "/profile")}
         >
-          <FaUserCircle className="text-white text-3xl" />
+          <FaUserCircle className="text-white text-2xl" />
         </button>
       </div>
     );

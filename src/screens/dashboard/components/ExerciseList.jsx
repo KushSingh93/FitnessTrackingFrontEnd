@@ -7,7 +7,8 @@ const ExerciseList = ({
   onSearchChange,
   onAddExercise,
   onAddCustomExercise,
-  onToggleFavorite, //  Added favorite toggle
+  onToggleFavorite,
+  bodyPartIcons, // Receive bodyPartIcons as a prop
 }) => {
   // Filter and sort exercises (favorites on top)
   const filteredExercises = exercises.filter(
@@ -23,9 +24,8 @@ const ExerciseList = ({
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
       <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-wide uppercase mb-6">
-  Arsenal
-</h2>
-
+        Arsenal
+      </h2>
 
       {/* Search Bar */}
       <input
@@ -52,22 +52,37 @@ const ExerciseList = ({
           sortedExercises.map((exercise) => (
             <div
               key={exercise.exerciseId}
-              className="flex justify-between bg-gray-700 p-3 rounded mb-2"
+              className="bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition duration-200 p-4 mb-2 flex items-center justify-between" // Card styling
             >
-              <span>
-                {exercise.exerciseName}{" "}
-                <span className="text-gray-400">({exercise.bodyPart})</span>{" "}
-                - {exercise.caloriesBurntPerRep} kcal
-              </span>
+              <div className="flex items-center">
+                {/* Body Part Icon */}
+                <img
+                  src={bodyPartIcons[exercise.bodyPart.toLowerCase()] || bodyPartIcons.default}
+                  alt={exercise.bodyPart}
+                  className="w-6 h-6 mr-2"
+                />
+
+                {/* Exercise Name and Muscle Group */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{exercise.exerciseName}</h3>
+                  <p className="text-sm text-gray-400">({exercise.bodyPart})</p>
+                </div>
+              </div>
+
+              {/* Calories, Star, and Add Button */}
               <div className="flex items-center space-x-4">
-                {/* Favorite Button */}
+                <span className="text-gray-400 text-sm">{exercise.caloriesBurntPerRep} kcal</span>
+
+                {/* Favorite Button (Star) */}
                 <button
                   onClick={() => onToggleFavorite(exercise)}
-                  className={`text-lg hover:text-red-500 transition ${
-                    favoriteExercises.has(exercise.exerciseId) ? "text-red-400" : "text-gray-400"
+                  className={`text-lg transition ${
+                    favoriteExercises.has(exercise.exerciseId)
+                      ? "text-yellow-500"
+                      : "text-gray-400 hover:text-yellow-500"
                   }`}
                 >
-                  {favoriteExercises.has(exercise.exerciseId) ? "❤️" : "🤍"}
+                  {favoriteExercises.has(exercise.exerciseId) ? "★" : "☆"}
                 </button>
 
                 {/* Add to Workout Button */}
