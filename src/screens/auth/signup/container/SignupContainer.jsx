@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { signup } from "../api";  
+import { signup } from "../api";
 import SignupForm from "../components/SignupForm";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../../../assets/images/ironLogLogo.png";  
+import Logo from "../../../../assets/images/ironLogLogo.png";
 
 class SignupContainer extends Component {
   state = {
@@ -19,20 +19,21 @@ class SignupContainer extends Component {
 
   handleSignup = async () => {
     this.setState({ loading: true, error: "" });
+    const { name, email, password } = this.state;
 
     try {
-      const response = await signup({ 
-        name: this.state.name, 
-        email: this.state.email, 
-        password: this.state.password 
+      const response = await signup({
+        name: { name },
+        email: { email },
+        password: { password },
       });
 
-      const token = response.token || response.data?.token; 
+      const token = response.token || response.data?.token;
 
       if (token) {
-        localStorage.setItem("token", token);  
+        localStorage.setItem("token", token);
         console.log("Signup successful, Token stored:", token);
-        this.props.navigate("/login");  
+        this.props.navigate("/login");
       } else {
         throw new Error("No token received from API.");
       }
@@ -44,15 +45,17 @@ class SignupContainer extends Component {
   };
 
   render() {
+    const { name, email, password, error, loading } = this.state;
+    const { handleChange, handleSignup } = this;
     return (
       <SignupForm
-        name={this.state.name}
-        email={this.state.email}
-        password={this.state.password}
-        error={this.state.error}
-        loading={this.state.loading}
-        handleChange={this.handleChange}
-        handleSignup={this.handleSignup}
+        name={name}
+        email={email}
+        password={password}
+        error={error}
+        loading={loading}
+        handleChange={handleChange}
+        handleSignup={handleSignup}
         logo={Logo}
       />
     );

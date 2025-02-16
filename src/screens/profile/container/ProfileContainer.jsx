@@ -39,7 +39,10 @@ class ProfileContainer extends Component {
   }
 
   handleChange = (e) => {
-    this.setState({ isEditing: true, formData: { ...this.state.formData, [e.target.name]: e.target.value } });
+    this.setState({
+      isEditing: true,
+      formData: { ...this.state.formData, [e.target.name]: e.target.value },
+    });
   };
 
   calculateBMI = () => {
@@ -62,7 +65,10 @@ class ProfileContainer extends Component {
     try {
       const token = localStorage.getItem("token");
       await updateUserProfile(token, this.state.formData);
-      this.setState({ userData: { ...this.state.userData, ...this.state.formData }, isEditing: false });
+      this.setState({
+        userData: { ...this.state.userData, ...this.state.formData },
+        isEditing: false,
+      });
     } catch (error) {
       this.setState({ error: "Failed to update profile." });
     }
@@ -70,8 +76,8 @@ class ProfileContainer extends Component {
 
   handleLogout = () => {
     logoutUser();
-    localStorage.removeItem("token"); 
-    this.props.navigate("/login"); 
+    localStorage.removeItem("token");
+    this.props.navigate("/login");
   };
 
   render() {
@@ -103,12 +109,12 @@ class ProfileContainer extends Component {
             handleSave={this.handleUpdate}
           />
         ) : (
-          <ProfileDetails 
-            userData={userData} 
-            onEdit={() => this.setState({ isEditing: true })} 
-            handleLogout={this.handleLogout} 
-            calculateBMI={this.calculateBMI}   
-            getBMICategory={this.getBMICategory} 
+          <ProfileDetails
+            userData={userData}
+            onEdit={() => this.setState({ isEditing: true })}
+            handleLogout={this.handleLogout}
+            calculateBMI={this.calculateBMI}
+            getBMICategory={this.getBMICategory}
           />
         )}
       </div>

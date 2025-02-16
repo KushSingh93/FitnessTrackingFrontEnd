@@ -95,12 +95,12 @@ const ExerciseList = ({
                 </button>
 
                 {/* Add to Workout Button */}
-<button
-  onClick={() => onAddExercise(exercise)}
-  className="text-teal-400 text-lg hover:text-teal-500" // Teal color
->
-  +
-</button>
+                <button
+                  onClick={() => onAddExercise(exercise)}
+                  className="text-teal-400 text-lg hover:text-teal-500" // Teal color
+                >
+                  +
+                </button>
               </div>
             </div>
           ))

@@ -1,11 +1,5 @@
 import React, { Component } from "react";
 import { getAllExercises, addCustomExercise } from "../api/exerciseApi";
-import { FaUserCircle, FaChartBar } from "react-icons/fa";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
-
 import {
   getTodaysWorkoutExercises,
   addExerciseToWorkout,
@@ -18,10 +12,8 @@ import {
   addToFavorites,
   removeFromFavorites,
 } from "../api/favExerciseApi";
-import ExerciseList from "../components/ExerciseList";
-import TodaysWorkout from "../components/TodaysWorkout";
-import WorkoutModals from "../components/WorkoutModals";
-import RepeatWorkoutModal from "../components/RepeatWorkoutModal";
+import UserDashboardView from "../components/UserDashboardView";
+import dayjs from "dayjs";
 
 class UserDashboardContainer extends Component {
   state = {
@@ -44,6 +36,15 @@ class UserDashboardContainer extends Component {
     customCalories: "",
     error: null,
     loading: true,
+  };
+
+  bodyPartIcons = {
+    chest: "/src/assets/images/chest.png",
+    legs: "/src/assets/images/legs.png",
+    arms: "/src/assets/images/arms.png",
+    back: "/src/assets/images/back.png",
+    abs: "/src/assets/images/abs.png",
+    shoulder: "/src/assets/images/shoulder.png",
   };
 
   async componentDidMount() {
@@ -150,19 +151,16 @@ class UserDashboardContainer extends Component {
     }
 
     try {
+      await removeExerciseFromWorkout(token, workoutExerciseId);
       const updatedWorkout = todaysWorkout.filter(
         (exercise) => exercise.workoutExerciseId !== workoutExerciseId
       );
       this.setState({ todaysWorkout: updatedWorkout });
 
-      await removeExerciseFromWorkout(token, workoutExerciseId);
-
       console.log("Exercise removed successfully.");
     } catch (error) {
       console.error("Failed to remove exercise from workout:", error);
       this.setState({ error: "Failed to remove exercise from workout." });
-
-      this.setState({ todaysWorkout });
     }
   };
 
@@ -203,8 +201,7 @@ class UserDashboardContainer extends Component {
     // Clear today's workout on the backend
     try {
       const today = dayjs().format("YYYY-MM-DD");
-      const todaysWorkoutExercises = await getTodaysWorkoutExercises(token); // Fetch today's exercises
-      console.log("Today's Workout Exercises:", todaysWorkoutExercises); // Debugging: Log the exercises
+      const todaysWorkoutExercises = await getTodaysWorkoutExercises(token);
 
       // Ensure todaysWorkoutExercises is an array
       if (!Array.isArray(todaysWorkoutExercises)) {
@@ -296,195 +293,62 @@ class UserDashboardContainer extends Component {
     const bodyParts = ["ARMS", "BACK", "LEGS", "SHOULDER", "CHEST", "ABS"];
 
     const bodyPartIcons = {
-      chest: "/src/assets/images/chest.png", // Path to your chest icon
-      legs: "/src/assets/images/legs.png", // Path to your legs icon
-      arms: "/src/assets/images/arms.png", // Path to your arms icon
-      back: "/src/assets/images/back.png", // Path to your back icon
-      abs: "/src/assets/images/abs.png", // Path to your abs icon
-      shoulder: "/src/assets/images/shoulder.png", // Path to your shoulder icon
+      chest: "/src/assets/images/chest.png",
+      legs: "/src/assets/images/legs.png",
+      arms: "/src/assets/images/arms.png",
+      back: "/src/assets/images/back.png",
+      abs: "/src/assets/images/abs.png",
+      shoulder: "/src/assets/images/shoulder.png",
     };
 
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
-        {/* Logo */}
-        <div className="w-full text-center mb-8 mt-4">
-          <img
-            src="/src/assets/images/ironLogLogo.png"
-            alt="Iron Log Logo"
-            className="h-20 mx-auto"
-          />
-        </div>
-        {/* Streak Display */}
-        <div className="absolute top-4 left-4 flex justify-center items-center">
-          <div className="relative">
-            <img
-              src="/src/assets/images/fireFinal.png"
-              alt="Streak"
-              className="w-12.3 h-12.3 drop-shadow-lg"
-            />
-            <span className="absolute top-[69%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xl">
-              {streak}
-            </span>
-          </div>
-        </div>
-
-        {/*  Analysis Button */}
-        <button
-          className="absolute top-4 right-4 bg-gray-800 p-3 rounded-lg shadow-lg hover:bg-gray-700 transition"
-          onClick={() => (window.location.href = "/analysis")}
-        >
-          <FaChartBar className="text-white text-2xl" />
-        </button>
-
-        <div className="w-full max-w-5xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ExerciseList
-            exercises={arsenalExercises}
-            favoriteExercises={favoriteExercises}
-            searchQuery={searchQuery}
-            onSearchChange={(e) =>
-              this.setState({ searchQuery: e.target.value })
-            }
-            onAddExercise={this.handleAddExerciseClick}
-            onAddCustomExercise={this.handleOpenCustomExerciseDialog}
-            onToggleFavorite={this.handleToggleFavorite}
-            bodyPartIcons={bodyPartIcons} // Pass the icons as a prop
-          />
-
-          <TodaysWorkout
-            exercises={todaysWorkout}
-            onRemoveExercise={this.handleRemoveExercise}
-            onRepeatWorkout={() => this.setState({ showDatePicker: true })}
-            onDateSelect={this.handleDateChange}
-          />
-        </div>
-
-        {/*  Calendar Popup for Selecting a Workout Date */}
-        {showDatePicker && (
-          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-              <h2 className="text-xl font-bold text-white mb-4">Select Date</h2>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  value={selectedDate}
-                  onChange={(newDate) => this.handleDateChange(newDate)}
-                  className="bg-white rounded p-2 w-full"
-                />
-              </LocalizationProvider>
-              <button
-                onClick={() => this.setState({ showDatePicker: false })}
-                className="w-full mt-4 bg-red-500 text-white px-4 py-2 rounded-lg"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Repeat Workout Modal */}
-        {isRepeatModalOpen && (
-          <RepeatWorkoutModal
-            exercises={repeatWorkoutExercises}
-            onClose={() => this.setState({ isRepeatModalOpen: false })}
-            onCopy={this.handleCopyWorkout}
-          />
-        )}
-
-        {/* Workout Modals for Adding Exercises */}
-        <WorkoutModals
-          dialogOpen={dialogOpen}
-          selectedExercise={selectedExercise}
-          sets={sets}
-          reps={reps}
-          onSetsChange={(e) => this.setState({ sets: e.target.value })}
-          onRepsChange={(e) => this.setState({ reps: e.target.value })}
-          onClose={() => this.setState({ dialogOpen: false })}
-          onAddToWorkout={this.handleAddToWorkout}
-          customDialogOpen={customDialogOpen}
-          customName={customName}
-          customBodyPart={customBodyPart}
-          customCalories={customCalories}
-          onCustomNameChange={(e) =>
-            this.setState({ customName: e.target.value })
-          }
-          onCustomBodyPartChange={(e) =>
-            this.setState({ customBodyPart: e.target.value })
-          }
-          onCustomCaloriesChange={(e) =>
-            this.setState({ customCalories: e.target.value })
-          }
-          onCloseCustomDialog={this.handleCloseCustomDialog}
-          onAddCustomExercise={this.handleAddCustomExercise}
-          repeatWorkoutExercises={repeatWorkoutExercises}
-          isRepeatModalOpen={isRepeatModalOpen}
-          onCopyWorkout={this.handleCopyWorkout}
-          onCloseRepeatModal={() => this.setState({ isRepeatModalOpen: false })}
-        />
-
-        {/* Custom Exercise Dialog */}
-        {customDialogOpen && (
-          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
-              <h2 className="text-xl font-bold text-white mb-4">
-                Add Custom Exercise
-              </h2>
-              <input
-                type="text"
-                placeholder="Exercise Name"
-                value={customName}
-                onChange={(e) => this.setState({ customName: e.target.value })}
-                className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
-              />
-              <select
-                value={customBodyPart}
-                onChange={(e) =>
-                  this.setState({ customBodyPart: e.target.value })
-                }
-                className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
-              >
-                <option value="" disabled>
-                  Select Body Part
-                </option>
-                {bodyParts.map((part) => (
-                  <option key={part} value={part}>
-                    {part}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                placeholder="Calories Burnt per Rep"
-                value={customCalories}
-                onChange={(e) =>
-                  this.setState({ customCalories: e.target.value })
-                }
-                className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={this.handleCloseCustomDialog}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={this.handleAddCustomExercise}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Add Exercise
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/*  Profile Button */}
-        <button
-          className="absolute bottom-4 right-4 bg-gray-800 p-3 rounded-lg shadow-lg hover:bg-gray-700 transition"
-          onClick={() => (window.location.href = "/profile")}
-        >
-          <FaUserCircle className="text-white text-2xl" />
-        </button>
-      </div>
+      <UserDashboardView
+        arsenalExercises={arsenalExercises}
+        todaysWorkout={todaysWorkout}
+        favoriteExercises={favoriteExercises}
+        searchQuery={searchQuery}
+        dialogOpen={dialogOpen}
+        customDialogOpen={customDialogOpen}
+        showDatePicker={showDatePicker}
+        isRepeatModalOpen={isRepeatModalOpen}
+        selectedExercise={selectedExercise}
+        selectedDate={selectedDate}
+        repeatWorkoutExercises={repeatWorkoutExercises}
+        sets={sets}
+        reps={reps}
+        streak={streak}
+        customName={customName}
+        customBodyPart={customBodyPart}
+        customCalories={customCalories}
+        bodyPartIcons={bodyPartIcons}
+        onSearchChange={(e) => this.setState({ searchQuery: e.target.value })}
+        onAddExercise={this.handleAddExerciseClick}
+        onAddCustomExercise={this.handleOpenCustomExerciseDialog}
+        onToggleFavorite={this.handleToggleFavorite}
+        onRemoveExercise={this.handleRemoveExercise}
+        onRepeatWorkout={() => this.setState({ showDatePicker: true })}
+        onDateSelect={this.handleDateChange}
+        onSetsChange={(e) => this.setState({ sets: e.target.value })}
+        onRepsChange={(e) => this.setState({ reps: e.target.value })}
+        onClose={() => this.setState({ dialogOpen: false })}
+        onAddToWorkout={this.handleAddToWorkout}
+        onCustomNameChange={(e) =>
+          this.setState({ customName: e.target.value })
+        }
+        onCustomBodyPartChange={(e) =>
+          this.setState({ customBodyPart: e.target.value })
+        }
+        onCustomCaloriesChange={(e) =>
+          this.setState({ customCalories: e.target.value })
+        }
+        onCloseCustomDialog={this.handleCloseCustomDialog}
+        onAddCustomExerciseSubmit={this.handleAddCustomExercise}
+        onCopyWorkout={this.handleCopyWorkout}
+        onCloseRepeatModal={() => this.setState({ isRepeatModalOpen: false })}
+        handleDateChange={this.handleDateChange}
+        handleCloseCustomDialog={this.handleCloseCustomDialog}
+        bodyParts={bodyParts}
+      />
     );
   }
 }

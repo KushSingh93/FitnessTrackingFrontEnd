@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { login } from "../api";  
+import { login } from "../api";
 import LoginForm from "../components/LoginForm";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../../../assets/images/ironLogLogo.png";  
+import Logo from "../../../../assets/images/ironLogLogo.png";
 
 class LoginContainer extends Component {
   state = {
@@ -20,11 +20,14 @@ class LoginContainer extends Component {
     this.setState({ loading: true, error: "" });
 
     try {
-      const token = await login({ email: this.state.email, password: this.state.password });
+      const token = await login({
+        email: this.state.email,
+        password: this.state.password,
+      });
 
       if (token) {
-        localStorage.setItem("token", token);  
-        this.props.navigate("/dashboard");  
+        localStorage.setItem("token", token);
+        this.props.navigate("/dashboard");
       } else {
         throw new Error("No token received from API.");
       }
@@ -36,14 +39,17 @@ class LoginContainer extends Component {
   };
 
   render() {
+    const { email, password, error, loading } = this.state;
+    const { handleChange, handleLogin } = this;
+
     return (
       <LoginForm
-        email={this.state.email}
-        password={this.state.password}
-        error={this.state.error}
-        loading={this.state.loading}
-        handleChange={this.handleChange}
-        handleLogin={this.handleLogin}
+        email={email}
+        password={password}
+        error={error}
+        loading={loading}
+        handleChange={handleChange}
+        handleLogin={handleLogin}
         logo={Logo}
       />
     );

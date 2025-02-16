@@ -35,9 +35,9 @@ const CaloriesChart = ({ data, totalCalories }) => {
       {
         label: "Calories Burned",
         data: sortedData.map(([, value]) => value),
-        borderColor: "rgba(0, 191, 255, 1)", // ✅ Clean blue line
-        backgroundColor: "rgba(0, 191, 255, 0.2)", // ✅ Subtle blue fill
-        tension: 0.4, // ✅ Smooth curve
+        borderColor: "rgba(0, 191, 255, 1)",
+        backgroundColor: "rgba(0, 191, 255, 0.2)",
+        tension: 0.4,
         fill: true,
         pointRadius: 5,
         pointHoverRadius: 8,
@@ -45,12 +45,14 @@ const CaloriesChart = ({ data, totalCalories }) => {
     ],
   };
 
+  // Controls the behavior and appearance of a chart.
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       y: {
-        beginAtZero: true, // ✅ Forces Y-axis to start from 0
+        beginAtZero: true,
         ticks: {
           callback: (value) => `${value} kcal`,
         },
@@ -64,7 +66,7 @@ const CaloriesChart = ({ data, totalCalories }) => {
       },
     },
     plugins: {
-      legend: { display: true }
+      legend: { display: true },
     },
   };
 

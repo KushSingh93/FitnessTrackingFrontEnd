@@ -27,7 +27,7 @@ const WorkoutModals = ({
 }) => {
   return (
     <>
-      {/* 📌 Add Exercise Modal */}
+      {/*  Add Exercise Modal */}
       {dialogOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -66,7 +66,7 @@ const WorkoutModals = ({
         </div>
       )}
 
-      {/* 📌 Add Custom Exercise Modal */}
+      {/*  Add Custom Exercise Modal */}
       {customDialogOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg relative w-96">

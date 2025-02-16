@@ -1,6 +1,6 @@
 import React from "react";
-import { FaTrash } from "react-icons/fa"; // Import the trash icon
-import { FaDumbbell } from "react-icons/fa"; // Example exercise icon
+import { FaTrash } from "react-icons/fa"; 
+import { FaDumbbell } from "react-icons/fa";
 
 const TodaysWorkout = ({
   exercises,
