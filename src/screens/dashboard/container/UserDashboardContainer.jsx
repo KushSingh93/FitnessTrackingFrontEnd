@@ -38,15 +38,6 @@ class UserDashboardContainer extends Component {
     loading: true,
   };
 
-  bodyPartIcons = {
-    chest: "/src/assets/images/chest.png",
-    legs: "/src/assets/images/legs.png",
-    arms: "/src/assets/images/arms.png",
-    back: "/src/assets/images/back.png",
-    abs: "/src/assets/images/abs.png",
-    shoulder: "/src/assets/images/shoulder.png",
-  };
-
   async componentDidMount() {
     try {
       const token = localStorage.getItem("token");

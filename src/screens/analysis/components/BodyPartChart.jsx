@@ -1,5 +1,6 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
+import { CHART_DATASETS } from '../constants';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,14 +17,11 @@ const BodyPartChart = ({ data, mostTrainedBodyPart }) => {
   if (!data || Object.keys(data).length === 0) return <p className="text-gray-400 italic">No data available</p>;
 
   const chartData = {
-    labels: Object.keys(data),
-    datasets: [
-      {
-        label: "Frequency",
-        data: Object.values(data),
-        backgroundColor: "rgba(0, 191, 255, 0.7)", // ✅ Using a single muted blue
-      },
-    ],
+    labels: Object.keys(data), 
+    datasets: CHART_DATASETS.map((dataset) => ({
+      ...dataset, 
+      data: Object.values(data), 
+    })),
   };
 
   const options = {

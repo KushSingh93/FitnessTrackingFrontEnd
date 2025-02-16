@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from "react";
+import { BODY_PARTS } from "../constants";
 
 const RepeatWorkoutModal = lazy(() => import("./RepeatWorkoutModal"));
 
@@ -98,13 +99,11 @@ const WorkoutModals = ({
               className="w-full p-2 mb-3 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Body Part</option>
-              {["ARMS", "BACK", "CHEST", "SHOULDER", "ABS", "LEGS"].map(
-                (part) => (
-                  <option key={part} value={part}>
-                    {part}
-                  </option>
-                )
-              )}
+              {BODY_PARTS.map((part) => (
+                <option key={part} value={part}>
+                  {part}
+                </option>
+              ))}
             </select>
 
             {/* Calories Burned Per Set */}
@@ -132,7 +131,7 @@ const WorkoutModals = ({
         </div>
       )}
 
-      {/*  Lazy-Loaded Repeat Workout Modal (It loads only when the user selects Repeat Workout.) */} 
+      {/*  Lazy-Loaded Repeat Workout Modal (It loads only when the user selects Repeat Workout.) */}
       {isRepeatModalOpen && (
         <Suspense fallback={<div>Loading Repeat Workout...</div>}>
           <RepeatWorkoutModal

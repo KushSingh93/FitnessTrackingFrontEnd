@@ -1,4 +1,5 @@
 import React from "react";
+import { CALORIES_BURNED_DATASET } from "../constants";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -33,14 +34,8 @@ const CaloriesChart = ({ data, totalCalories }) => {
     labels: sortedData.map(([date]) => date),
     datasets: [
       {
-        label: "Calories Burned",
+        ...CALORIES_BURNED_DATASET,
         data: sortedData.map(([, value]) => value),
-        borderColor: "rgba(0, 191, 255, 1)",
-        backgroundColor: "rgba(0, 191, 255, 0.2)",
-        tension: 0.4,
-        fill: true,
-        pointRadius: 5,
-        pointHoverRadius: 8,
       },
     ],
   };
