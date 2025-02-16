@@ -70,14 +70,14 @@ class ProfileContainer extends Component {
 
   handleLogout = () => {
     logoutUser();
-    localStorage.removeItem("token");  // ✅ Ensure token is removed
-    this.props.navigate("/login");  // ✅ Redirect user after logout
+    localStorage.removeItem("token"); 
+    this.props.navigate("/login"); 
   };
 
   render() {
     const { userData, formData, isEditing, loading, error } = this.state;
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center justify-center p-6">
         {/* Back Button */}
         <button
           className="absolute top-4 left-4 bg-gray-800 p-3 rounded-full hover:bg-gray-700 transition duration-200"
@@ -87,9 +87,13 @@ class ProfileContainer extends Component {
         </button>
 
         {loading ? (
-          <p>Loading profile...</p>
+          <div className="flex justify-center items-center h-screen">
+            <p className="text-xl text-gray-300">Loading profile...</p>
+          </div>
         ) : error ? (
-          <p className="text-red-400">{error}</p>
+          <div className="flex justify-center items-center h-screen">
+            <p className="text-red-400 text-xl">{error}</p>
+          </div>
         ) : isEditing ? (
           <EditProfileForm
             formData={formData}
@@ -103,8 +107,8 @@ class ProfileContainer extends Component {
             userData={userData} 
             onEdit={() => this.setState({ isEditing: true })} 
             handleLogout={this.handleLogout} 
-            calculateBMI={this.calculateBMI}   // ✅ Pass BMI function
-            getBMICategory={this.getBMICategory}  // ✅ Pass BMI category function
+            calculateBMI={this.calculateBMI}   
+            getBMICategory={this.getBMICategory} 
           />
         )}
       </div>
