@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import { getAllExercises, addCustomExercise } from "../api/exerciseApi";
-import {
-  FaUserCircle,
-  FaChartBar,
-} from "react-icons/fa";
+import { FaUserCircle, FaChartBar } from "react-icons/fa";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -308,7 +305,7 @@ class UserDashboardContainer extends Component {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
+      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
         {/* Logo */}
         <div className="w-full text-center mb-8 mt-4">
           <img
@@ -323,9 +320,9 @@ class UserDashboardContainer extends Component {
             <img
               src="/src/assets/images/fireFinal.png"
               alt="Streak"
-              className="w-12 h-12 drop-shadow-lg"
+              className="w-12.3 h-12.3 drop-shadow-lg"
             />
-            <span className="absolute inset-0 flex justify-center items-center text-white font-bold text-xl">
+            <span className="absolute top-[69%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xl">
               {streak}
             </span>
           </div>

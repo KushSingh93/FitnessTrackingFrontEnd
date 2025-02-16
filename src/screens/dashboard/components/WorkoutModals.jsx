@@ -1,5 +1,6 @@
-import React from "react";
-import RepeatWorkoutModal from "./RepeatWorkoutModal";
+import React, { lazy, Suspense } from "react";
+
+const RepeatWorkoutModal = lazy(() => import("./RepeatWorkoutModal"));
 
 const WorkoutModals = ({
   dialogOpen,
@@ -131,13 +132,15 @@ const WorkoutModals = ({
         </div>
       )}
 
-      {/* Repeat Workout Modal */}
+      {/*  Lazy-Loaded Repeat Workout Modal (It loads only when the user selects Repeat Workout.) */} 
       {isRepeatModalOpen && (
-        <RepeatWorkoutModal
-          exercises={repeatWorkoutExercises}
-          onClose={onCloseRepeatModal}
-          onCopy={onCopyWorkout}
-        />
+        <Suspense fallback={<div>Loading Repeat Workout...</div>}>
+          <RepeatWorkoutModal
+            exercises={repeatWorkoutExercises}
+            onClose={onCloseRepeatModal}
+            onCopy={onCopyWorkout}
+          />
+        </Suspense>
       )}
     </>
   );

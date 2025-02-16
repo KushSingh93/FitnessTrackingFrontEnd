@@ -10,8 +10,7 @@ const TodaysWorkout = ({
 }) => {
   const totalCalories = exercises.reduce(
     (sum, exercise) =>
-      sum +
-      (exercise.caloriesBurntPerRep || 0) * exercise.sets * exercise.reps,
+      sum + (exercise.caloriesBurntPerRep || 0) * exercise.sets * exercise.reps,
     0
   );
 
@@ -60,7 +59,7 @@ const TodaysWorkout = ({
                   </span>
                   <button
                     onClick={() => onRemoveExercise(exercise.workoutExerciseId)}
-                    className="text-red-400 hover:text-red-500 transition"
+                    className="text-red-300 hover:text-red-400 transition" // Muted red
                   >
                     <FaTrash />
                   </button>
@@ -71,9 +70,10 @@ const TodaysWorkout = ({
 
           <div className="mt-6 py-2 px-4 bg-gray-700 rounded-md flex justify-between items-center">
             <span className="text-lg font-semibold text-white">
-              Total Calories Burned:
+              Total Calories:
             </span>
-            <span className="text-2xl font-bold text-green-400">
+            <span className="text-2xl font-bold text-sky-400">
+              {" "}
               {totalCalories} kcal
             </span>
           </div>
@@ -82,7 +82,7 @@ const TodaysWorkout = ({
 
       <button
         onClick={onRepeatWorkout}
-        className="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:bg-gradient-to-l hover:shadow-md text-white py-3 rounded-lg"
+        className="w-full mt-6 bg-gradient-to-r from-sky-400 to-sky-500 hover:bg-gradient-to-l hover:shadow-md text-white py-3 rounded-lg"
       >
         Repeat Workout
       </button>

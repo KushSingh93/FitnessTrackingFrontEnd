@@ -18,7 +18,9 @@ const ExerciseList = ({
   );
 
   const sortedExercises = [...filteredExercises].sort((a, b) => {
-    return favoriteExercises.has(b.exerciseId) - favoriteExercises.has(a.exerciseId);
+    return (
+      favoriteExercises.has(b.exerciseId) - favoriteExercises.has(a.exerciseId)
+    );
   });
 
   return (
@@ -39,7 +41,7 @@ const ExerciseList = ({
       {/* Add Custom Exercise Button */}
       <button
         onClick={onAddCustomExercise}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+        className="w-full bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-lg mb-4"
       >
         + Add Custom Exercise
       </button>
@@ -57,41 +59,48 @@ const ExerciseList = ({
               <div className="flex items-center">
                 {/* Body Part Icon */}
                 <img
-                  src={bodyPartIcons[exercise.bodyPart.toLowerCase()] || bodyPartIcons.default}
+                  src={
+                    bodyPartIcons[exercise.bodyPart.toLowerCase()] ||
+                    bodyPartIcons.default
+                  }
                   alt={exercise.bodyPart}
                   className="w-6 h-6 mr-2"
                 />
 
                 {/* Exercise Name and Muscle Group */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{exercise.exerciseName}</h3>
+                  <h3 className="text-lg font-semibold text-white">
+                    {exercise.exerciseName}
+                  </h3>
                   <p className="text-sm text-gray-400">({exercise.bodyPart})</p>
                 </div>
               </div>
 
               {/* Calories, Star, and Add Button */}
               <div className="flex items-center space-x-4">
-                <span className="text-gray-400 text-sm">{exercise.caloriesBurntPerRep} kcal</span>
+                <span className="text-gray-400 text-sm">
+                  {exercise.caloriesBurntPerRep} kcal
+                </span>
 
                 {/* Favorite Button (Star) */}
                 <button
                   onClick={() => onToggleFavorite(exercise)}
                   className={`text-lg transition ${
                     favoriteExercises.has(exercise.exerciseId)
-                      ? "text-yellow-500"
-                      : "text-gray-400 hover:text-yellow-500"
+                      ? "text-yellow-500" // Active state: sky blue
+                      : "text-gray-400 hover:text-sky-500" // Inactive state: gray with sky blue hover
                   }`}
                 >
                   {favoriteExercises.has(exercise.exerciseId) ? "★" : "☆"}
                 </button>
 
                 {/* Add to Workout Button */}
-                <button
-                  onClick={() => onAddExercise(exercise)}
-                  className="text-green-400 text-lg hover:text-green-500"
-                >
-                  +
-                </button>
+<button
+  onClick={() => onAddExercise(exercise)}
+  className="text-teal-400 text-lg hover:text-teal-500" // Teal color
+>
+  +
+</button>
               </div>
             </div>
           ))
