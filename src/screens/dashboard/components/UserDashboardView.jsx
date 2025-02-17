@@ -58,7 +58,7 @@ const UserDashboardView = ({
         <img
           src="/src/assets/images/ironLogLogo.png"
           alt="Iron Log Logo"
-          className="h-20 mx-auto"
+          className="h-32 mx-auto"
         />
       </div>
 
@@ -69,7 +69,7 @@ const UserDashboardView = ({
             <img
               src="/src/assets/images/fireFinal.png"
               alt="Streak"
-              className="w-12.3 h-12.3 drop-shadow-lg"
+              className="w-12.6 h-12.6 drop-shadow-lg"
             />
             <span className="absolute top-[69%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xl">
               {streak}
@@ -81,7 +81,7 @@ const UserDashboardView = ({
       {/* Analysis Button */}
       <Tippy content="Analysis" placement="bottom">
         <button
-          className="absolute top-4 right-4 bg-gray-800 p-3 rounded-lg shadow-lg hover:bg-gray-700 transition"
+          className="absolute top-4 right-4 bg-gray-800 p-5 rounded-lg shadow-lg hover:bg-gray-700 transition"
           onClick={() => (window.location.href = "/analysis")}
         >
           <FaChartBar className="text-white text-2xl" />
@@ -219,10 +219,10 @@ const UserDashboardView = ({
       {/* Profile Button */}
       <Tippy content="Profile" placement="top">
         <button
-          className="absolute bottom-4 right-4 bg-gray-800 p-3 rounded-lg shadow-lg hover:bg-gray-700 transition"
+          className="fixed bottom-4 right-4 bg-gray-800 p-4 rounded-full shadow-lg hover:bg-gray-700 transition"
           onClick={() => (window.location.href = "/profile")}
         >
-          <FaUserCircle className="text-white text-2xl" />
+          <FaUserCircle className="text-white text-3xl" />
         </button>
       </Tippy>
     </div>
