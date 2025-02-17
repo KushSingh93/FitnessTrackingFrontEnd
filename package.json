@@ -12,7 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/material": "^6.4.3",
+    "@mui/material": "^6.4.4",
     "@mui/x-date-pickers": "^7.26.0",
     "@tippyjs/react": "^4.2.6",
     "axios": "^1.7.9",

@@ -3,7 +3,7 @@ import { login } from "../api";
 import LoginForm from "../components/LoginForm";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../../assets/images/ironLogLogo.png";
-import Cookies from 'js-cookie'; // Import js-cookie
+import Cookies from "js-cookie"; // Import js-cookie
 
 class LoginContainer extends Component {
   state = {
@@ -27,8 +27,9 @@ class LoginContainer extends Component {
       });
 
       if (token) {
-        Cookies.set('token', token, { expires: 7, path: '/' }); // Store token in cookie
-        this.props.navigate("/dashboard");
+        Cookies.set("token", token, { expires: 7, path: "/" }); // Store token in cookie
+        // this.props.navigate("/dashboard");
+        window.location.replace("/dashboard");
       } else {
         throw new Error("No token received from API.");
       }
