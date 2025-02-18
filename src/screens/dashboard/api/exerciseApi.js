@@ -22,3 +22,15 @@ export const addCustomExercise = async (exerciseData) => {
     throw error.response?.data || { message: "Failed to add exercise." };
   }
 };
+
+// Delete Exercise API
+export const deleteExercise = async (exerciseId) => {
+  try {
+    const response = await apiClient.delete(`/exercises/${exerciseId}`);
+    console.log("Deleted Exercise:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting exercise:", error);
+    throw error.response?.data || { message: "Failed to delete exercise." };
+  }
+};

@@ -3,7 +3,8 @@ import { getWorkoutSummary } from "../api";
 import { getUserStreak } from "../../profile/api";
 import AnalysisComponent from "../components";
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie'; // Import js-cookie
+import Cookies from "js-cookie"; // Import js-cookie
+import Swal from "sweetalert2";
 
 class AnalysisContainer extends Component {
   constructor(props) {
@@ -32,8 +33,8 @@ class AnalysisContainer extends Component {
       this.setState({ loading: true });
 
       const [summaryData, streakData] = await Promise.all([
-        getWorkoutSummary(this.state.selectedPeriod), 
-        getUserStreak(), 
+        getWorkoutSummary(this.state.selectedPeriod),
+        getUserStreak(),
       ]);
 
       this.setState({
@@ -53,9 +54,30 @@ class AnalysisContainer extends Component {
   handleStreakClick = () => {
     const { streak } = this.state;
     if (streak && streak.startDate) {
-      alert(`🔥 Your streak started on: ${streak.startDate}`);
+      Swal.fire({
+        title: `Streak started on: ${streak.startDate}`,
+        icon: "info",
+        confirmButtonText: "Cool",
+        customClass: {
+          popup: "custom-popup-dark-blue",
+          confirmButton: "custom-confirm-button-dark-blue",
+        },
+        background: "#1a1a2e",
+        color: "#ffffff",
+      });
     } else {
-      alert("🔥 No streak start date available.");
+      Swal.fire({
+        title: " No Streak",
+        text: "No streak start date available.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        customClass: {
+          popup: "custom-popup-dark-blue",
+          confirmButton: "custom-confirm-button-dark-blue",
+        },
+        background: "#1a1a2e",
+        color: "#ffffff",
+      });
     }
   };
 

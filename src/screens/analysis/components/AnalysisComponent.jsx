@@ -31,7 +31,7 @@ const AnalysisComponent = ({
           <img
             src="/src/assets/images/fireFinal.png"
             alt="Streak"
-            className="w-15 h-15 animate-pulse"
+            className="w-20 h-20 animate-pulse"
           />
           <span className="absolute top-[69%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-lg">
             {streak?.streakCount || 0}

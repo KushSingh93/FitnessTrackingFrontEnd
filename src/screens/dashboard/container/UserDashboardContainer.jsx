@@ -1,5 +1,9 @@
 import React, { Component } from "react";
-import { getAllExercises, addCustomExercise } from "../api/exerciseApi";
+import {
+  getAllExercises,
+  addCustomExercise,
+  deleteExercise,
+} from "../api/exerciseApi";
 import {
   getTodaysWorkoutExercises,
   addExerciseToWorkout,
@@ -36,6 +40,7 @@ class UserDashboardContainer extends Component {
     customCalories: "",
     error: null,
     loading: true,
+    currentUserId: null,
   };
 
   async componentDidMount() {
@@ -55,6 +60,7 @@ class UserDashboardContainer extends Component {
         todaysWorkout: todaysWorkout,
         streak: streakData.streakCount,
         favoriteExercises: new Set(favoriteExercises),
+        currentUserId: exercises[0]?.userId,
         loading: false,
       });
     } catch (error) {
@@ -112,13 +118,24 @@ class UserDashboardContainer extends Component {
 
   handleAddToWorkout = async () => {
     const { selectedExercise, sets, reps, todaysWorkout } = this.state;
+
     if (!selectedExercise || !sets || !reps) return;
+
+    // Convert sets and reps to integers
+    const setsInt = parseInt(sets);
+    const repsInt = parseInt(reps);
+
+    if (setsInt <= 0 || repsInt <= 0) {
+      this.setState({ error: "Sets and reps must be greater than 0." });
+      return;
+    }
 
     const exerciseData = {
       exerciseId: selectedExercise.exerciseId,
-      sets: parseInt(sets),
-      reps: parseInt(reps),
+      sets: setsInt,
+      reps: repsInt,
     };
+
     try {
       const newExercise = await addExerciseToWorkout(exerciseData);
       this.setState({
@@ -126,6 +143,7 @@ class UserDashboardContainer extends Component {
         dialogOpen: false,
         sets: "",
         reps: "",
+        error: "", // Clear any previous error message
       });
     } catch (error) {
       console.error("Failed to add exercise to workout:", error);
@@ -237,6 +255,21 @@ class UserDashboardContainer extends Component {
     }
   };
 
+  handleDeleteExercise = async (exerciseId) => {
+    try {
+      // Call API to delete the exercise
+      await deleteExercise(exerciseId);
+      // Update state by removing the deleted exercise
+      this.setState((prevState) => ({
+        arsenalExercises: prevState.arsenalExercises.filter(
+          (exercise) => exercise.exerciseId !== exerciseId
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to delete exercise:", error);
+      this.setState({ error: "Failed to delete exercise." });
+    }
+  };
   render() {
     const {
       arsenalExercises,
@@ -256,19 +289,8 @@ class UserDashboardContainer extends Component {
       customName,
       customBodyPart,
       customCalories,
+      currentUserId,
     } = this.state;
-
-    const bodyParts = ["ARMS", "BACK", "LEGS", "SHOULDER", "CHEST", "ABS"];
-
-    const bodyPartIcons = {
-      chest: "/src/assets/images/chest.png",
-      legs: "/src/assets/images/legs.png",
-      arms: "/src/assets/images/arms.png",
-      back: "/src/assets/images/back.png",
-      abs: "/src/assets/images/abs.png",
-      shoulder: "/src/assets/images/shoulder.png",
-    };
-
     return (
       <UserDashboardView
         arsenalExercises={arsenalExercises}
@@ -288,7 +310,6 @@ class UserDashboardContainer extends Component {
         customName={customName}
         customBodyPart={customBodyPart}
         customCalories={customCalories}
-        bodyPartIcons={bodyPartIcons}
         onSearchChange={(e) => this.setState({ searchQuery: e.target.value })}
         onAddExercise={this.handleAddExerciseClick}
         onAddCustomExercise={this.handleOpenCustomExerciseDialog}
@@ -315,7 +336,8 @@ class UserDashboardContainer extends Component {
         onCopyWorkout={this.handleCopyWorkout}
         handleDateChange={this.handleDateChange}
         handleCloseCustomDialog={this.handleCloseCustomDialog}
-        bodyParts={bodyParts}
+        onDeleteExercise={this.handleDeleteExercise}
+        currentUserId={currentUserId}
       />
     );
   }

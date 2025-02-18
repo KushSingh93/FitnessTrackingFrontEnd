@@ -2,13 +2,28 @@ import React from "react";
 import { FaUserCircle, FaChartBar } from "react-icons/fa";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import ExerciseList from "./ExerciseList";
 import TodaysWorkout from "./TodaysWorkout";
 import WorkoutModals from "./WorkoutModals";
 import RepeatWorkoutModal from "./RepeatWorkoutModal";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { BODY_PARTS, BODY_PART_ICONS, theme } from "../constants";
+import { ThemeProvider } from '@mui/material/styles';
+
+function MyDateCalendar({ selectedDate, handleDateChange }) {
+  return (
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DateCalendar
+          value={selectedDate}
+          onChange={handleDateChange}
+        />
+      </LocalizationProvider>
+    </ThemeProvider>
+  );
+}
 
 const UserDashboardView = ({
   arsenalExercises,
@@ -28,7 +43,6 @@ const UserDashboardView = ({
   customName,
   customBodyPart,
   customCalories,
-  bodyPartIcons,
   onSearchChange,
   onAddExercise,
   onAddCustomExercise,
@@ -49,11 +63,11 @@ const UserDashboardView = ({
   onCloseRepeatModal,
   handleDateChange,
   handleCloseCustomDialog,
-  bodyParts,
+  onDeleteExercise,
+  currentUserId
 }) => {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center relative">
-      {/* Logo */}
       <div className="w-full text-center mb-8 mt-4">
         <img
           src="/src/assets/images/ironLogLogo.png"
@@ -62,7 +76,6 @@ const UserDashboardView = ({
         />
       </div>
 
-      {/* Streak Display */}
       <div className="absolute top-4 left-4 flex justify-center items-center">
         <Tippy content={`Streak`}>
           <div className="relative">
@@ -78,7 +91,6 @@ const UserDashboardView = ({
         </Tippy>
       </div>
 
-      {/* Analysis Button */}
       <Tippy content="Analysis" placement="bottom">
         <button
           className="absolute top-4 right-4 bg-gray-800 p-5 rounded-lg shadow-lg hover:bg-gray-700 transition"
@@ -97,7 +109,9 @@ const UserDashboardView = ({
           onAddExercise={onAddExercise}
           onAddCustomExercise={onAddCustomExercise}
           onToggleFavorite={onToggleFavorite}
-          bodyPartIcons={bodyPartIcons}
+          bodyPartIcons={BODY_PART_ICONS}
+          currentUserId={currentUserId}
+          onDeleteExercise={onDeleteExercise}
         />
 
         <TodaysWorkout
@@ -108,20 +122,16 @@ const UserDashboardView = ({
         />
       </div>
 
-      {/* Calendar Popup for Selecting a Workout Date */}
       {showDatePicker && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold text-white mb-4">Select Date</h2>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                value={selectedDate}
-                onChange={(newDate) => handleDateChange(newDate)}
-                className="bg-white rounded p-2 w-full"
-              />
-            </LocalizationProvider>
+            <MyDateCalendar
+              selectedDate={selectedDate}
+              handleDateChange={handleDateChange}
+            />
             <button
-              onClick={() => onRepeatWorkout(false)} // Close the date picker
+              onClick={() => onRepeatWorkout(false)}
               className="w-full mt-4 bg-red-500 text-white px-4 py-2 rounded-lg"
             >
               Close
@@ -130,16 +140,14 @@ const UserDashboardView = ({
         </div>
       )}
 
-      {/* Repeat Workout Modal */}
       {isRepeatModalOpen && (
         <RepeatWorkoutModal
           exercises={repeatWorkoutExercises}
-          onClose={onCloseRepeatModal} // Pass the correct function
+          onClose={onCloseRepeatModal}
           onCopy={onCopyWorkout}
         />
       )}
 
-      {/* Workout Modals for Adding Exercises */}
       <WorkoutModals
         dialogOpen={dialogOpen}
         selectedExercise={selectedExercise}
@@ -163,7 +171,6 @@ const UserDashboardView = ({
         onCloseRepeatModal={onCloseRepeatModal}
       />
 
-      {/* Custom Exercise Dialog */}
       {customDialogOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
@@ -185,7 +192,7 @@ const UserDashboardView = ({
               <option value="" disabled>
                 Select Body Part
               </option>
-              {bodyParts.map((part) => (
+              {BODY_PARTS.map((part) => (
                 <option key={part} value={part}>
                   {part}
                 </option>
@@ -216,7 +223,6 @@ const UserDashboardView = ({
         </div>
       )}
 
-      {/* Profile Button */}
       <Tippy content="Profile" placement="top">
         <button
           className="fixed bottom-4 right-4 bg-gray-800 p-4 rounded-full shadow-lg hover:bg-gray-700 transition"
