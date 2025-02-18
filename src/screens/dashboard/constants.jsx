@@ -6,7 +6,7 @@ import backIcon from "/src/assets/images/back.png";
 import absIcon from "/src/assets/images/abs.png";
 import shoulderIcon from "/src/assets/images/shoulder.png";
 
-export const BODY_PARTS = ["arms", "back", "legs", "shoulder", "chest", "abs"];
+export const BODY_PARTS = ["ARMS", "BACK", "LEGS", "SHOULDER", "CHEST", "ABS"];
 
 export const BODY_PART_ICONS = {
   chest: chestIcon,

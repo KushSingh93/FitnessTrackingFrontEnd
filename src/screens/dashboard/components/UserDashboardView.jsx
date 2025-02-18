@@ -72,7 +72,7 @@ const UserDashboardView = ({
         <img
           src="/src/assets/images/ironLogLogo.png"
           alt="Iron Log Logo"
-          className="h-32 mx-auto"
+          className="h-24 mx-auto"
         />
       </div>
 
