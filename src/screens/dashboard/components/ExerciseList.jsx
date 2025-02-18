@@ -21,9 +21,7 @@ const ExerciseList = ({
   // Filter exercises by search query and selected body part
   const filteredExercises = exercises.filter((exercise) => {
     const searchMatch =
-      exercise.exerciseName
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
+      exercise.exerciseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       exercise.bodyPart.toLowerCase().includes(searchQuery.toLowerCase());
     const bodyPartMatch =
       selectedBodyPart === "" ||
@@ -113,9 +111,7 @@ const ExerciseList = ({
                   <h3 className="text-lg font-semibold text-white">
                     {exercise.exerciseName}
                   </h3>
-                  <p className="text-sm text-gray-400">
-                    ({exercise.bodyPart})
-                  </p>
+                  <p className="text-sm text-gray-400">({exercise.bodyPart})</p>
                 </div>
               </div>
 
@@ -144,11 +140,17 @@ const ExerciseList = ({
                 >
                   +
                 </button>
-                {/* Delete Button (Conditionally Rendered) */}
-                {exercise.userId === currentUserId && (
+                {exercise.userId === currentUserId ? (
                   <button
                     onClick={() => onDeleteExercise(exercise.exerciseId)}
-                    className="text-red-300 text-sm hover:text-red-600"
+                    className="text-red-500 text-sm hover:text-red-600"
+                  >
+                    Delete
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="text-gray-400 text-sm cursor-not-allowed"
                   >
                     Delete
                   </button>

@@ -64,7 +64,7 @@ class ProfileContainer extends Component {
 
   handleUpdate = async () => {
     try {
-      await updateUserProfile(this.state.formData); // No token needed here
+      await updateUserProfile(this.state.formData); 
       this.setState({
         userData: { ...this.state.userData, ...this.state.formData },
         isEditing: false,

@@ -28,7 +28,6 @@ class LoginContainer extends Component {
 
       if (token) {
         Cookies.set("token", token, { expires: 7, path: "/" }); // Store token in cookie
-        // this.props.navigate("/dashboard");
         window.location.replace("/dashboard");
       } else {
         throw new Error("No token received from API.");

@@ -3,6 +3,7 @@ import {
   getAllExercises,
   addCustomExercise,
   deleteExercise,
+  getCurrentUserId,
 } from "../api/exerciseApi";
 import {
   getTodaysWorkoutExercises,
@@ -47,20 +48,26 @@ class UserDashboardContainer extends Component {
     try {
       this.setState({ loading: true });
 
-      const [exercises, todaysWorkout, streakData, favoriteExercises] =
-        await Promise.all([
-          getAllExercises(),
-          getTodaysWorkoutExercises(),
-          getUserStreak(),
-          getFavoriteExercises(),
-        ]);
+      const [
+        exercises,
+        todaysWorkout,
+        streakData,
+        favoriteExercises,
+        currentUserId,
+      ] = await Promise.all([
+        getAllExercises(),
+        getTodaysWorkoutExercises(),
+        getUserStreak(),
+        getFavoriteExercises(),
+        getCurrentUserId(), // Fetch current user ID
+      ]);
 
       this.setState({
         arsenalExercises: exercises,
         todaysWorkout: todaysWorkout,
         streak: streakData.streakCount,
         favoriteExercises: new Set(favoriteExercises),
-        currentUserId: exercises[0]?.userId,
+        currentUserId: currentUserId, // Set currentUserId from API
         loading: false,
       });
     } catch (error) {
@@ -270,6 +277,7 @@ class UserDashboardContainer extends Component {
       this.setState({ error: "Failed to delete exercise." });
     }
   };
+
   render() {
     const {
       arsenalExercises,

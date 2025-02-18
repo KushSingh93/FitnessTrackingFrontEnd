@@ -34,3 +34,15 @@ export const deleteExercise = async (exerciseId) => {
     throw error.response?.data || { message: "Failed to delete exercise." };
   }
 };
+
+// New function to fetch current user's ID
+export const getCurrentUserId = async () => {
+  try {
+    const response = await apiClient.get("/users/current");
+    console.log("Fetched Current User ID:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching current user ID:", error);
+    throw error.response?.data || { message: "Failed to fetch current user ID." };
+  }
+};

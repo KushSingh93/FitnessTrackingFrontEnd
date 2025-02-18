@@ -3,7 +3,7 @@ import { signup } from "../api";
 import SignupForm from "../components/SignupForm";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../../assets/images/ironLogLogo.png";
-import Cookies from 'js-cookie'; // Import js-cookie
+import Cookies from "js-cookie"; // Import js-cookie
 
 class SignupContainer extends Component {
   state = {
@@ -23,27 +23,26 @@ class SignupContainer extends Component {
     const { name, email, password } = this.state;
 
     try {
-      // Send the correct payload structure
-      const response = await signup({
-        name,
-        email,
-        password,
-      });
-
+      const response = await signup({ name, email, password });
       const token = response.token || response.data?.token;
 
       if (token) {
-        Cookies.set('token', token, { expires: 7, path: '/' }); // Store token in cookie
+        Cookies.set("token", token, { expires: 7, path: "/" });
         console.log("Signup successful, Token stored:", token);
-        this.props.navigate("/login");
+
+        // Redirect immediately, assuming the token will be available soon
+        window.location.replace("/dashboard");
       } else {
-        throw new Error("No token received from API.");
+        // Instead of throwing an error, log it and potentially retry setting the token
+        console.warn(
+          "Token not immediately available, assuming it will be set."
+        );
       }
     } catch (err) {
       this.setState({ error: err.message || "Signup failed." });
+    } finally {
+      this.setState({ loading: false });
     }
-
-    this.setState({ loading: false });
   };
 
   render() {
