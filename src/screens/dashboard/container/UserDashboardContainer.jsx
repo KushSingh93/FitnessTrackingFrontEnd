@@ -301,6 +301,7 @@ class UserDashboardContainer extends Component {
     } = this.state;
     return (
       <UserDashboardView
+        key={arsenalExercises.length}
         arsenalExercises={arsenalExercises}
         todaysWorkout={todaysWorkout}
         favoriteExercises={favoriteExercises}
