@@ -21,8 +21,8 @@ const ExerciseList = ({
   // Filter exercises by search query and selected body part
   const filteredExercises = exercises.filter((exercise) => {
     const searchMatch =
-      exercise.exerciseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exercise.bodyPart.toLowerCase().includes(searchQuery.toLowerCase());
+      exercise.exerciseName?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
+      exercise.bodyPart?.toLowerCase().includes(searchQuery?.toLowerCase());
     const bodyPartMatch =
       selectedBodyPart === "" ||
       exercise.bodyPart.toUpperCase() === selectedBodyPart; // case-insensitive comparison

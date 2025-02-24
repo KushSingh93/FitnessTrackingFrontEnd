@@ -8,11 +8,16 @@ const TodaysWorkout = ({
   onRepeatWorkout,
   onDateSelect,
 }) => {
-  const totalCalories = exercises.reduce(
-    (sum, exercise) =>
-      sum + (exercise.caloriesBurntPerRep || 0) * exercise.sets * exercise.reps,
-    0
+  const totalCalories = parseFloat(
+    exercises
+      .reduce(
+        (sum, exercise) =>
+          sum + (exercise.caloriesBurntPerRep || 0) * exercise.sets * exercise.reps,
+        0
+      )
+      .toFixed(1)
   );
+  
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg">

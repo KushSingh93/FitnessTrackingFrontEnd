@@ -3,7 +3,7 @@ import { getUserProfile, updateUserProfile, logoutUser } from "../api";
 import { ProfileDetails, EditProfileForm } from "../components";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie'; // Import js-cookie
+import Cookies from "js-cookie"; // Import js-cookie
 
 class ProfileContainer extends Component {
   state = {
@@ -22,7 +22,7 @@ class ProfileContainer extends Component {
     }
 
     try {
-      const data = await getUserProfile(); 
+      const data = await getUserProfile();
       this.setState({
         userData: data,
         formData: {
@@ -56,15 +56,15 @@ class ProfileContainer extends Component {
   getBMICategory = () => {
     const bmi = this.calculateBMI();
     if (bmi === "N/A") return "N/A";
-    if (bmi < 18.5) return "Underweight 🟡";
-    if (bmi < 25) return "Normal Weight ✅";
-    if (bmi < 30) return "Overweight 🟠";
+    if (bmi < 18.5) return "UnderWeight🟡";
+    if (bmi < 25) return "HealthyWeight✅";
+    if (bmi < 30) return "OverWeighted🟠";
     return "Obese 🔴";
   };
 
   handleUpdate = async () => {
     try {
-      await updateUserProfile(this.state.formData); 
+      await updateUserProfile(this.state.formData);
       this.setState({
         userData: { ...this.state.userData, ...this.state.formData },
         isEditing: false,
@@ -76,13 +76,13 @@ class ProfileContainer extends Component {
 
   handleLogout = () => {
     logoutUser();
-    Cookies.remove('token', { path: '/' }); // Remove the token cookie
+    Cookies.remove("token", { path: "/" }); // Remove the token cookie
     this.props.navigate("/login");
   };
 
   render() {
     const { userData, formData, isEditing, loading, error } = this.state;
-    
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center justify-center p-6">
         {/* Back Button */}
